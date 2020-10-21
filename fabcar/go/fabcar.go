@@ -1,6 +1,10 @@
 /*
 Copyright 2020 IBM All Rights Reserved.
 
+fabcar.go main program containing some chaincode interaction commands for testing written BL chaincode locally
+
+Edited by Malte Garmhausen
+
 SPDX-License-Identifier: Apache-2.0
 */
 
@@ -61,34 +65,41 @@ func main() {
 
 	contract := network.GetContract("fabcar")
 
-	result, err := contract.EvaluateTransaction("queryAllCars")
+	result, err := contract.EvaluateTransaction("QueryAllBls")
 	if err != nil {
 		fmt.Printf("Failed to evaluate transaction: %s\n", err)
 		os.Exit(1)
 	}
 	fmt.Println(string(result))
 
-	result, err = contract.SubmitTransaction("createCar", "CAR10", "VW", "Polo", "Grey", "Mary")
+	result, err = contract.SubmitTransaction("CreateBl", "CAR10", "HS Bremerhaven", "21.10.2020", "Bremerhaven", "Karin Vosseberg")
 	if err != nil {
 		fmt.Printf("Failed to submit transaction: %s\n", err)
 		os.Exit(1)
 	}
 	fmt.Println(string(result))
 
-	result, err = contract.EvaluateTransaction("queryCar", "CAR10")
+	result, err = contract.EvaluateTransaction("QueryBl", "CAR10")
 	if err != nil {
 		fmt.Printf("Failed to evaluate transaction: %s\n", err)
 		os.Exit(1)
 	}
 	fmt.Println(string(result))
 
-	_, err = contract.SubmitTransaction("changeCarOwner", "CAR10", "Archie")
+	_, err = contract.SubmitTransaction("ChangeBlOwner", "CAR10", "Peter Kelb")
 	if err != nil {
 		fmt.Printf("Failed to submit transaction: %s\n", err)
 		os.Exit(1)
 	}
 
-	result, err = contract.EvaluateTransaction("queryCar", "CAR10")
+	result, err = contract.EvaluateTransaction("QueryBl", "CAR10")
+	if err != nil {
+		fmt.Printf("Failed to evaluate transaction: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Println(string(result))
+
+	result, err = contract.EvaluateTransaction("QueryAllBls")
 	if err != nil {
 		fmt.Printf("Failed to evaluate transaction: %s\n", err)
 		os.Exit(1)

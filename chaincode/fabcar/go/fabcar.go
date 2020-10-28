@@ -22,12 +22,16 @@ type SmartContract struct {
 	contractapi.Contract
 }
 
+//BL Felder
+
 // Car describes basic details of what makes up a car
 type BillOfLading struct {
-	Shipper   string `json:"make"`
+	Shipper   string `json:"shipper"`
 	DateOfIssue  string `json:"dateofissue"`
 	PlaceOfIssue string `json:"placeofissue"`
 	Owner  string `json:"owner"`
+
+	// blData := {{info}, {shipper}, {consignee}}
 }
 
 // QueryResult structure used for handling result of query

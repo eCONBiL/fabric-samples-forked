@@ -3,6 +3,8 @@ Copyright 2020 IBM All Rights Reserved.
 
 fabcar.go main program containing some chaincode interaction commands for testing written BL chaincode locally
 
+edited for using command line arguments for chaincode interaction 
+
 Edited by Malte Garmhausen
 
 SPDX-License-Identifier: Apache-2.0
@@ -72,6 +74,80 @@ func main() {
 	}
 	fmt.Println(string(result))
 
+	if len(os.Args) > 1 {
+
+		var argument string = os.Args[1]
+		
+		if ( argument == "help" ) || ( argument == "H" ) || (argument == "Help" ) || ( argument == "h" ) {
+			fmt.Println()
+			fmt.Println("Use this program to interact with deployed chaincode")
+			fmt.Println("Arguments are:")
+			fmt.Println("    queryAll")
+			fmt.Println("    query")
+			fmt.Println("    create")
+			fmt.Println("    changeOwner")
+
+		}	
+
+		if argument == "queryAll" {
+		result, err := contract.EvaluateTransaction("queryAllBls")
+		if err != nil {
+			fmt.Printf("Failed to evaluate transaction: %s\n", err)
+			os.Exit(1)
+			}
+			fmt.Println(string(result))
+
+		} else if  argument == "create" {
+			if len(os.Args) == 7 {
+				var createArgId string = os.Args[2]
+				var createArgSh string = os.Args[3]
+				var createArgDoi string = os.Args[4]
+				var createArgPoi string = os.Args[5]
+				var createArgOw string = os.Args[6]
+				result, err = contract.SubmitTransaction("createBl", createArgId, createArgSh, createArgDoi, createArgPoi, createArgOw)
+				if err != nil {
+					fmt.Printf("Failed to submit transaction: %s\n", err)
+					os.Exit(1)
+				}
+				fmt.Println(string(result))
+
+			} else {
+				fmt.Println("6 Arguments expected  |  go run fabcar-mod.go [create {BLID} {BLSHIPPER} {DATEOFISSUE} {PLACEOFISSUE} {BLOWNER}]")
+			}
+		} else if  argument == "query" {
+			if len(os.Args) == 3 {
+				var queryArg string = os.Args[2]
+				result, err = contract.EvaluateTransaction("queryBl", queryArg)
+				if err != nil {
+					fmt.Printf("Failed to evaluate transaction: %s\n", err)
+					os.Exit(1)
+				}
+				fmt.Println(string(result))
+
+			} else {
+				fmt.Println("2 Arguments expected  |  go run fabcar-mod.go [query {BLID}]")
+			}
+		} else if argument == "changeOwner" {
+			if len(os.Args) == 4 {
+				var changeArgId string = os.Args[2]
+				var changeArgOw string = os.Args[3]
+				_, err = contract.SubmitTransaction("changeBlOwner", changeArgId, changeArgOw)
+				if err != nil {
+					fmt.Printf("Failed to submit transaction: %s\n", err)
+					os.Exit(1)
+				}
+			} else {
+				fmt.Println("3 Arguments expected  |  go run fabcar-mod.go [changeOwner {BLID} {NEWBLOWNER}]")
+			}
+		} else {
+			fmt.Println("No valid argument | try: queryAll , create , query , changeOwner")
+		}
+	} else {
+		fmt.Println("Missing argument(s) | try: queryAll , create , query , changeOwner")
+	}
+}
+
+/*
 	result, err = contract.SubmitTransaction("CreateBl", "CAR10", "HS Bremerhaven", "21.10.2020", "Bremerhaven", "Karin Vosseberg")
 	if err != nil {
 		fmt.Printf("Failed to submit transaction: %s\n", err)
@@ -106,6 +182,8 @@ func main() {
 	}
 	fmt.Println(string(result))
 }
+
+*/
 
 func populateWallet(wallet *gateway.Wallet) error {
 	credPath := filepath.Join(

@@ -67,12 +67,12 @@ func main() {
 
 	contract := network.GetContract("fabcar")
 
-	result, err := contract.EvaluateTransaction("QueryAllBls")
-	if err != nil {
-		fmt.Printf("Failed to evaluate transaction: %s\n", err)
-		os.Exit(1)
-	}
-	fmt.Println(string(result))
+	 result, err := contract.EvaluateTransaction("QueryAllBls")
+	 if err != nil {
+	 	fmt.Printf("Failed to evaluate transaction: %s\n", err)
+	 	os.Exit(1)
+	 }
+	// fmt.Println(string(result))
 
 	if len(os.Args) > 1 {
 

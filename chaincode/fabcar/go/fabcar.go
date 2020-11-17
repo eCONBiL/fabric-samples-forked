@@ -136,36 +136,36 @@ type BillOfLading struct {
 
 // BL Info Fields
 	BLNumber         string `json:"BLNumber"`
-    DateOfIssue      string `json:"DateOfIssue"`
-    PlaceOfIssue     string `json:"PlaceOfIssue"`
+    	DateOfIssue      string `json:"DateOfIssue"`
+    	PlaceOfIssue     string `json:"PlaceOfIssue"`
 	NumberOfBLIssued int    `json:"NumberOfBLIssued"`
 	
 //Shipper information	
 	ShipperName           string `json:"ShipperName"`
-    ShipperAddress        string `json:"ShipperAddress"`
-    ShipperContact        string `json:"ShipperContact"`
-    ShipperLegalForm      string `json:"ShipperLegalForm"`
-    ShipperSignature      string `json:"ShipperSignature"`
+    	ShipperAddress        string `json:"ShipperAddress"`
+    	ShipperContact        string `json:"ShipperContact"`
+    	ShipperLegalForm      string `json:"ShipperLegalForm"`
+    	ShipperSignature      string `json:"ShipperSignature"`
 	ShippperSignatureDate string `json:"ShippperSignatureDate"`
 
 //Consignee information
 	ConsigneeName      string `json:"ConsigneeName"`
-    ConsigneeAddress   string `json:"ConsigneeAddress"`
-    ConsigneeContact   string `json:"ConsigneeContact"`
-    ConsigneeLegalForm string `json:"ConsigneeLegalForm"`
+    	ConsigneeAddress   string `json:"ConsigneeAddress"`
+    	ConsigneeContact   string `json:"ConsigneeContact"`
+    	ConsigneeLegalForm string `json:"ConsigneeLegalForm"`
 	ConsigneePublicKey string `json:"ConsigneePublicKey"`
 	
 //Forwarding Agent Company information
 	AgentCompanyName      string `json:"AgentCompanyName"`
-    AgentCompanyLegalForm string `json:"AgentCompanyLegalForm"`
-    AgentCompanyAddress   string `json:"AgentCompanyAddress"`
+    	AgentCompanyLegalForm string `json:"AgentCompanyLegalForm"`
+    	AgentCompanyAddress   string `json:"AgentCompanyAddress"`
 	AgentCompanyPublicKey string `json:"AgentCompanyPublicKey"`
 	
 //Notify Party information	
 	NotifyPartyCompanyName      string `json:"NotifyPartyCompanyName"`
-    NotifyPartyCompanyAddress   string `json:"NotifyPartyCompanyAddress"`
-    NotifyPartyCompanyLegalForm string `json:"NotifyPartyCompanyLegalForm"`
-    NotifyPartyCompanyPublicKey string `json:"NotifyPartyCompanyPublicKey"`
+   	NotifyPartyCompanyAddress   string `json:"NotifyPartyCompanyAddress"`
+    	NotifyPartyCompanyLegalForm string `json:"NotifyPartyCompanyLegalForm"`
+    	NotifyPartyCompanyPublicKey string `json:"NotifyPartyCompanyPublicKey"`
 	NotifyPartySameAs           bool   `json:"NotifyPartySameAs"`
 	
 //Term of sale information
@@ -266,9 +266,12 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 }
 
 // CreateBl adds a new BL to the world state with given details
-func (s *SmartContract) CreateBl(ctx contractapi.TransactionContextInterface, blNumber string, shipper string, dateofissue string, placeofissue string, owner string) error {
+func (s *SmartContract) CreateBl(ctx contractapi.TransactionContextInterface, blNumber string, dateOfIssue string, dateofissue string, placeofissue string, owner string) error {
 	bl := BillOfLading{
-		//change arguments for this function and the way the arguments are passed into a new BL struct
+		//change arguments for this function and the way the arguments are passed into a new BL struct, should look like this 
+		// BLNumber: blNumber,
+		// DateOfIssue: dateOfIssue;
+		
 	}
 
 	blAsBytes, _ := json.Marshal(bl)

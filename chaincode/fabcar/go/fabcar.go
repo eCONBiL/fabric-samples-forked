@@ -4,7 +4,18 @@ SPDX-License-Identifier: Apache-2.0
 
 /*
 modified by Malte Garmhausen
+
+eCONBiL - electronical Consignment and Bill of Lading
+
 changes made for an implementation of the Bill of Lading freight document
+
+This chaincode has 43 of the collected BL fields implemented and provides functions for initializing the ledger, querying specific B/Ls, querying
+all B/Ls from the ledger as well as creating a new B/L.
+The initialization-function creates one default B/L into the ledger.
+
+Chaincode querys and invokes must be issued through the "interface program" found in /fabric-samples/fabcar/go/fabcar.go which is currently used as
+command line interface
+
 */
 
 package main
@@ -22,198 +33,92 @@ type SmartContract struct {
 	contractapi.Contract
 }
 
-
-//BL Felder
-// Info describes basic infos from BL
-// type Info struct {
-//     BLNumber         string `json:"BLNumber"`
-//     DateOfIssue      string `json:"DateOfIssue"`
-//     PlaceOfIssue     string `json:"PlaceOfIssue"`
-//     NumberOfBLIssued int    `json:"NumberOfBLIssued"`
-// }
- 
-// Shipper describes basic infos from Shipper
-// type Shipper struct {
-//     ShipperName           string `json:"ShipperName"`
-//     ShipperAddress        string `json:"ShipperAddress"`
-//     ShipperContact        string `json:"ShipperContact"`
-//     ShipperLegalForm      string `json:"ShipperLegalForm"`
-//     ShipperSignature      string `json:"ShipperSignature"`
-//     ShippperSignatureDate string `json:"ShippperSignatureDate"`
-//}
-/* 
-// Consignee describes basic infos from Consignee
-type Consignee struct {
-    ConsigneeName      string `json:"ConsigneeName"`
-    ConsigneeAddress   string `json:"ConsigneeAddress"`
-    ConsigneeContact   string `json:"ConsigneeContact"`
-    ConsigneeLegalForm string `json:"ConsigneeLegalForm"`
-    ConsigneePublicKey string `json:"ConsigneePublicKey"`
-}
- 
-// Carrier describes basic infos from Carrier
-type Carrier struct {
-    CarrierName          string `json:"CarrierName"`
-    CarrierAddress       string `json:"CarrierAddress"`
-    CarrierContact       string `json:"CarrierContact"`
-    CarrierLegalForm     string `json:"CarrierLegalForm"`
-    CarrierPublicKey     string `json:"CarrierPublicKey"`
-    CarrierTrailerNumber string `json:"CarrierTrailerNumber"`
-    CarrierSignature     string `json:"CarrierSignature"`
-    CarrierSignatureDate string `json:"CarrierSignatureDate"`
-}
- 
-// Forwarding Agent Company describes basic infos from Forwarding Agent Company
-type ForwardingAgentCompany struct {
-    AgentCompanyName      string `json:"AgentCompanyName"`
-    AgentCompanyLegalForm string `json:"AgentCompanyLegalForm"`
-    AgentCompanyAddress   string `json:"AgentCompanyAddress"`
-    AgentCompanyPublicKey string `json:"AgentCompanyPublicKey"`
-}
- 
-// Notify Party describes basic infos from Notify Party
-type NotifyParty struct {
-    NotifyPartyCompanyName      string `json:"NotifyPartyCompanyName"`
-    NotifyPartyCompanyAddress   string `json:"NotifyPartyCompanyAddress"`
-    NotifyPartyCompanyLegalForm string `json:"NotifyPartyCompanyLegalForm"`
-    NotifyPartyCompanyPublicKey string `json:"NotifyPartyCompanyPublicKey"`
-    NotifyPartySameAs           bool   `json:"NotifyPartySameAs"`
-}
- 
-// Term of Sale describes basic infos from Term of Sale
-type TermOfSale struct {
-    Incoterms string `json:"Incoterms"`
-}
- 
-// Freight describes basic infos from Freight
-type Freight struct {
-    FreightChargesCurrency string `json:"FreightChargesCurrency"`
-    Prepaid                bool   `json:"Prepaid"`
-    Collect                bool   `json:"Collect"`
-}
- 
-// TransportInfo describes basic infos from Transport
-type TransportInfo struct {
-    PortOfLoading         string `json:"PortOfLoading"`
-    PortOfDischarge       string `json:"PortOfDischarge"`
-    PlaceOfReceipt        string `json:"PlaceOfReceipt"`
-    PlaceOfDelivery       string `json:"PlaceOfDelivery"`
-    OceanVesselName       string `json:"OceanVesselName"`
-    ContainerNumber       int    `json:"ContainerNumber"`
-    FullContainerLoad     bool   `json:"FullContainerLoad"`
-    LessThenContainerLoad bool   `json:"LessThenContainerLoad"`
-    DateofReceived        string `json:"DateofReceived"`
-    ShippedOnBoardDate    string `json:"ShippedOnBoardDate"`
-}
- 
-// GrossInfo describes basic infos from Gross
-type GrossInfo struct {
-    MarksAndNumbers            string `json:"MarksAndNumbers"`
-    NumberOfPackages           int    `json:"NumberOfPackages"`
-    GrossWeight                int    `json:"GrossWeight"`
-    GrossWeightUnit            string `json:"GrossWeightUnit"`
-    DescriptionOfGoods         string `json:"DescriptionOfGoods"`
-    DescriptionPerPackage      int    `json:"DescriptionPerPackage"`
-    Measurement                int    `json:"Measurement"`
-    MeasurementUnit            string `json:"MeasurementUnit"`
-    DeclaredCargoValueAmount   int    `json:"DeclaredCargoValueAmount"`
-    DeclaredCargoValueCurrency string `json:"DeclaredCargoValueCurrency"`
-    AdditionalInformation      string `json:"AdditionalInformation"`
-    HazardousMaterial          string `json:"HazardousMaterial"`
-}
- 
-// Rest describes basic infos from Rest
-type Rest struct {
-    CustomerOrderNumber int `json:"CustomerOrderNumber"`
-}
-// Endorsement describes basic infos from Endorsement
-type Endorsement struct {
-    
-}
-*/
-
+//BillOfLading struct contains all BL-Data
 type BillOfLading struct {
 
-// BL Info Fields
+	// BL Info Fields
 	BLNumber         string `json:"BLNumber"`
-    	DateOfIssue      string `json:"DateOfIssue"`
-    	PlaceOfIssue     string `json:"PlaceOfIssue"`
+	DateOfIssue      string `json:"DateOfIssue"`
+	PlaceOfIssue     string `json:"PlaceOfIssue"`
 	NumberOfBLIssued int    `json:"NumberOfBLIssued"`
-	
-//Shipper information	
-	ShipperName           string `json:"ShipperName"`
-    	ShipperAddress        string `json:"ShipperAddress"`
-    	ShipperContact        string `json:"ShipperContact"`
-    	ShipperLegalForm      string `json:"ShipperLegalForm"`
-    	ShipperSignature      string `json:"ShipperSignature"`
-	ShippperSignatureDate string `json:"ShippperSignatureDate"`
 
-//Consignee information
+	//Shipper information
+	ShipperName      string `json:"ShipperName"`
+	ShipperAddress   string `json:"ShipperAddress"`
+	ShipperContact   string `json:"ShipperContact"`
+	ShipperLegalForm string `json:"ShipperLegalForm"`
+
+	//Consignee information
 	ConsigneeName      string `json:"ConsigneeName"`
-    	ConsigneeAddress   string `json:"ConsigneeAddress"`
-    	ConsigneeContact   string `json:"ConsigneeContact"`
-    	ConsigneeLegalForm string `json:"ConsigneeLegalForm"`
-	ConsigneePublicKey string `json:"ConsigneePublicKey"`
-	
-//Forwarding Agent Company information
+	ConsigneeAddress   string `json:"ConsigneeAddress"`
+	ConsigneeContact   string `json:"ConsigneeContact"`
+	ConsigneeLegalForm string `json:"ConsigneeLegalForm"`
+
+	//Carrier information
+	CarrierName          string `json:"CarrierName"`
+	CarrierAddress       string `json:"CarrierAddress"`
+	CarrierContact       string `json:"CarrierContact"`
+	CarrierLegalForm     string `json:"CarrierLegalForm"`
+	CarrierTrailerNumber string `json:"CarrierTrailerNumber"`
+
+	//Forwarding Agent Company information
 	AgentCompanyName      string `json:"AgentCompanyName"`
-    	AgentCompanyLegalForm string `json:"AgentCompanyLegalForm"`
-    	AgentCompanyAddress   string `json:"AgentCompanyAddress"`
-	AgentCompanyPublicKey string `json:"AgentCompanyPublicKey"`
-	
-//Notify Party information	
+	AgentCompanyLegalForm string `json:"AgentCompanyLegalForm"`
+	AgentCompanyAddress   string `json:"AgentCompanyAddress"`
+
+	//Notify Party information
 	NotifyPartyCompanyName      string `json:"NotifyPartyCompanyName"`
-   	NotifyPartyCompanyAddress   string `json:"NotifyPartyCompanyAddress"`
-    	NotifyPartyCompanyLegalForm string `json:"NotifyPartyCompanyLegalForm"`
-    	NotifyPartyCompanyPublicKey string `json:"NotifyPartyCompanyPublicKey"`
+	NotifyPartyCompanyAddress   string `json:"NotifyPartyCompanyAddress"`
+	NotifyPartyCompanyLegalForm string `json:"NotifyPartyCompanyLegalForm"`
 	NotifyPartySameAs           bool   `json:"NotifyPartySameAs"`
-	
-//Term of sale information
+
+	//Term of sale information
 	Incoterms string `json:"Incoterms"`
-	
-//Basic freight information 	
+
+	//Basic freight information
 	FreightChargesCurrency string `json:"FreightChargesCurrency"`
 	Prepaid                bool   `json:"Prepaid"`
 	Collect                bool   `json:"Collect"`
 
-//Transportinfo
+	//Transportinfo
 	PortOfLoading         string `json:"PortOfLoading"`
 	PortOfDischarge       string `json:"PortOfDischarge"`
 	PlaceOfReceipt        string `json:"PlaceOfReceipt"`
 	PlaceOfDelivery       string `json:"PlaceOfDelivery"`
 	OceanVesselName       string `json:"OceanVesselName"`
-	ContainerNumber       int    `json:"ContainerNumber"`
+	ContainerNumber       string `json:"ContainerNumber"`
 	FullContainerLoad     bool   `json:"FullContainerLoad"`
 	LessThenContainerLoad bool   `json:"LessThenContainerLoad"`
 	DateofReceived        string `json:"DateofReceived"`
 	ShippedOnBoardDate    string `json:"ShippedOnBoardDate"`
 
-//Gross info
-	MarksAndNumbers            string `json:"MarksAndNumbers"`
-	NumberOfPackages           int    `json:"NumberOfPackages"`
-	GrossWeight                int    `json:"GrossWeight"`
-	GrossWeightUnit            string `json:"GrossWeightUnit"`
-	DescriptionOfGoods         string `json:"DescriptionOfGoods"`
-	DescriptionPerPackage      int    `json:"DescriptionPerPackage"`
-	Measurement                int    `json:"Measurement"`
-	MeasurementUnit            string `json:"MeasurementUnit"`
-	DeclaredCargoValueAmount   int    `json:"DeclaredCargoValueAmount"`
-	DeclaredCargoValueCurrency string `json:"DeclaredCargoValueCurrency"`
-	AdditionalInformation      string `json:"AdditionalInformation"`
-	HazardousMaterial          string `json:"HazardousMaterial"`
+	//Gross info
+	MarksAndNumbers    string `json:"MarksAndNumbers"`
+	NumberOfPackages   int    `json:"NumberOfPackages"`
+	GrossWeight        int    `json:"GrossWeight"`
+	GrossWeightUnit    string `json:"GrossWeightUnit"`
+	DescriptionOfGoods string `json:"DescriptionOfGoods"`
 
-// Rest	
-	CustomerOrderNumber int `json:"CustomerOrderNumber"`
+	/* removed this fields temporarily because of argument limitation issue in create function */
+	// 	DescriptionPerPackage      int    `json:"DescriptionPerPackage"`
+	// 	Measurement                int    `json:"Measurement"`
+	// 	MeasurementUnit            string `json:"MeasurementUnit"`
+	// 	DeclaredCargoValueAmount   int    `json:"DeclaredCargoValueAmount"`
+	// 	DeclaredCargoValueCurrency string `json:"DeclaredCargoValueCurrency"`
+	// 	AdditionalInformation      string `json:"AdditionalInformation"`
+	// 	HazardousMaterial          bool `json:"HazardousMaterial"`
 
-/*
-// Used Conditions (ERA600, Art. 20 a)
-	TransportConditions string `json:"TransportConditions"`
-	ApplieableLaw	string `json:"ApplieableLaw"`
-	PlaceOfJurisdiction string `json:"PlaceOfJurisdiction"`
+	// // Rest
+	// 	CustomerOrderNumber int `json:"CustomerOrderNumber"`
 
-//Endorsement info 
-	//endorsement information still missing, needs to be implemented later
-*/
+	//Used Conditions (ERA600, Art. 20 a)
+	// 	TransportConditions string `json:"TransportConditions"`
+	// 	ApplieableLaw	string `json:"ApplieableLaw"`
+	// 	PlaceOfJurisdiction string `json:"PlaceOfJurisdiction"`
+
+	//Endorsement info
+	// 	endorsement information still missing, needs to be implemented later
+
 }
 
 // QueryResult structure used for handling result of query
@@ -225,37 +130,26 @@ type QueryResult struct {
 // InitLedger adds a base set of BL to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	bls := []BillOfLading{
-		BillOfLading{BLNumber: "TW ECON 1001", DateOfIssue: "10.11.2020", PlaceOfIssue: "Bremerhaven", NumberOfBLIssued: 2,
-					ShipperName: "Autohaus Main GmbH", ShipperAddress: "Hanauerlandstr. 3460314 Frankfurt, Germany", ShipperContact: "ahmain@beispiel.de", ShipperLegalForm: "GmbH", ShipperSignature: "Hashwert1", ShippperSignatureDate: "09.02.2020",
-					ConsigneeName: "German-Cars Ldt.", ConsigneeAddress: "Fue Avenue, A1 518108 Shanghai, China", ConsigneeContact: "86282452253", ConsigneeLegalForm: "Ldt.", ConsigneePublicKey: "ConsigneePublicKey",
-					AgentCompanyName: "BLG AutoTerminal Bremerhaven GmbH & Co. KG", AgentCompanyLegalForm: "GmbH & Co. KG", AgentCompanyAddress: "Senator-Borttscheller-Str. 1, 27568 Bremerhaven, Germany", AgentCompanyPublicKey: "AgentCompanyPublicKey",
-					NotifyPartyCompanyName: "German-Cars Ldt.", NotifyPartyCompanyAddress: "Fue Avenue, A1 518108 Shanghai, China", NotifyPartyCompanyLegalForm: "Ldt.", NotifyPartyCompanyPublicKey: "NotifyPartyPublicKey", NotifyPartySameAs: true,
-					Incoterms: "FOB (2020)",
-					FreightChargesCurrency: "USD", Prepaid: true, Collect: true,
-					PortOfLoading: "Bremerhaven Containerterminal", PortOfDischarge: "Shanghai Yangshan", PlaceOfReceipt: "Frankfurt am Main, Adresse, Germany", PlaceOfDelivery: "Shanghai, Adresse, China", OceanVesselName: "MSC Gulsun", ContainerNumber: 3, FullContainerLoad: true, LessThenContainerLoad: false, DateofReceived: "08.02.2020", ShippedOnBoardDate: "09.02.2020",
-					MarksAndNumbers: "40' steel Dry Cargo Container No CSQU3054383", NumberOfPackages: 15,GrossWeight: 4250, GrossWeightUnit: "Kg", DescriptionOfGoods: "engines and fitting engine parts packaged together on pallets", DescriptionPerPackage: 1, Measurement: 40, MeasurementUnit: "Feet", DeclaredCargoValueAmount: 75000, DeclaredCargoValueCurrency: "USD", AdditionalInformation: "-", HazardousMaterial: "none", 
-					CustomerOrderNumber: 1,
-					//Information about used conditions 
-					//Endorsement Information
+		BillOfLading{BLNumber: "TW ECON 1000", DateOfIssue: "10.11.2020", PlaceOfIssue: "Bremerhaven", NumberOfBLIssued: 2,
+			ShipperName: "Autohaus Main GmbH", ShipperAddress: "Hanauerlandstr. 3460314 Frankfurt, Germany", ShipperContact: "ahmain@beispiel.de", ShipperLegalForm: "GmbH",
+			ConsigneeName: "German-Cars Ldt.", ConsigneeAddress: "Fue Avenue, A1 518108 Shanghai, China", ConsigneeContact: "86282452253", ConsigneeLegalForm: "Ldt.",
+			CarrierName: "MSC Germany S.A. & Co. KG", CarrierAddress: "Hafenstraße 55, 282127 Bremen, Germany", CarrierContact: "deu-bremen@msc.de", CarrierLegalForm: "S.A. & Co. KG", CarrierTrailerNumber: "HB-KK-596",
+			AgentCompanyName: "BLG AutoTerminal Bremerhaven GmbH & Co. KG", AgentCompanyLegalForm: "GmbH & Co. KG", AgentCompanyAddress: "Senator-Borttscheller-Str. 1, 27568 Bremerhaven, Germany",
+			NotifyPartyCompanyName: "German-Cars Ldt.", NotifyPartyCompanyAddress: "Fue Avenue, A1 518108 Shanghai, China", NotifyPartyCompanyLegalForm: "Ldt.", NotifyPartySameAs: true,
+			Incoterms:              "FOB (2020)",
+			FreightChargesCurrency: "USD", Prepaid: true, Collect: true,
+			PortOfLoading: "Bremerhaven Containerterminal", PortOfDischarge: "Shanghai Yangshan", PlaceOfReceipt: "Frankfurt am Main, Adresse, Germany", PlaceOfDelivery: "Shanghai, Adresse, China", OceanVesselName: "MSC Gulsun", ContainerNumber: "OOLU1548378", FullContainerLoad: true, LessThenContainerLoad: false, DateofReceived: "08.02.2020", ShippedOnBoardDate: "09.02.2020",
+			MarksAndNumbers: "40' steel Dry Cargo Container No CSQU3054383", NumberOfPackages: 15, GrossWeight: 4250, GrossWeightUnit: "Kg", DescriptionOfGoods: "engines and fitting engine parts packaged together on pallets", /*DescriptionPerPackage: 1, Measurement: 40, MeasurementUnit: "Feet", DeclaredCargoValueAmount: 75000, DeclaredCargoValueCurrency: "USD", AdditionalInformation: "-", HazardousMaterial: false, */
+			//CustomerOrderNumber: 1,
+			//Information about used conditions
+			//Endorsement Information
 
-
-				},		 	
-		}
-			// Shipper{"Autohaus Main Gmbh", "Hanauerlandstr. 3460314 Frankfurt, Germany", "ahmain@beispiel.de", "GmbH", "Hashwert1", "09.02.2020"},
-			// Consignee{"German-Cars Ldt.", "Fue Avenue, A1 518108 Shanghai, China", "86282452253", "Ldt.", "ConsigneePublicKey"},
-			// Carrier{"MSC Germany S.A. & Co. KG", "Hafenstraße 55, 282127 Bremen, Germany", "deu-bremen@msc.de", "S.A. & Co. KG", "CarrierPublicKey","HB-KK-596", "Carriersignature", "09.02.2020"},
-			// ForwardingAgentCompany{"BLG AutoTerminal Bremerhaven GmbH & Co. KG", "GmbH & Co. KG", "Senator-Borttscheller-Str. 1, 27568 Bremerhaven, Germany", "AgentCompanyPublicKey"},
-			// NotifyParty{"German-Cars Ldt.", "Fue Avenue, A1 518108 Shanghai, China", "Ldt.", "NotifyPartyPublicKey", true},
-			// TermOfSale{"FOB (2020)"},
-			// Freight{"USD", true, true},
-			// TransportInfo{"Bremerhaven Containerterminal", "Shanghai Yangshan", "Frankfurt am Main, Adresse, Germany", "Shanghai, Adresse, China", "MSC Gulsun", 3, true, false, "08.02.2020", "09.02.2020"},
-			// GrossInfo{"40' steel Dry Cargo Container No CSQU3054383", 15, 4250, "Kg", "engines and fitting engine parts packaged together on pallets", 1, 40, "Feet", 75000, "USD", "-", "none"},
-			// Rest{1},},
-		
+		},
+	}
 
 	for i, bl := range bls {
 		blAsBytes, _ := json.Marshal(bl)
-		err := ctx.GetStub().PutState("TW ECON 1001"+strconv.Itoa(i), blAsBytes)
+		err := ctx.GetStub().PutState("TW ECON 100"+strconv.Itoa(i), blAsBytes)
 
 		if err != nil {
 			return fmt.Errorf("Failed to put to world state. %s", err.Error())
@@ -266,20 +160,122 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 }
 
 // CreateBl adds a new BL to the world state with given details
-func (s *SmartContract) CreateBl(ctx contractapi.TransactionContextInterface, blNumber string, dateOfIssue string, dateofissue string, placeofissue string, owner string) error {
+func (s *SmartContract) CreateBl(ctx contractapi.TransactionContextInterface, aBLNumber string, aDateOfIssue string, aPlaceOfIssue string, aNumberOfBLIssued string, aShipperName string, aShipperAddress string, aShipperContact string, aShipperLegalForm string,
+	aConsigneeName string, aConsigneeAddress string, aConsigneeContact string, aConsigneeLegalForm string,
+	aCarrierName string, aCarrierAddress string, aCarrierContact string, aCarrierLegalForm string, aCarrierTrailerNumber string,
+	aAgentCompanyName string, aAgentCompanyLegalForm string, aAgentCompanyAddress string, aNotifyPartyCompanyName string,
+	aNotifyPartyCompanyAddress string, aNotifyPartyCompanyLegalForm string, aNotifyPartySameAs string, aIncoterms string,
+	aFreightChargesCurrency string, aPrepaid string, aCollect string, aPortOfLoading string, aPortOfDischarge string, aPlaceOfReceipt string, aPlaceOfDelivery string,
+	aOceanVesselName string, aContainerNumber string, aFullContainerLoad string, aLessThenContainerLoad string, aDateofReceived string,
+	aShippedOnBoardDate string, aMarksAndNumbers string, aNumberOfPackages string, aGrossWeight string, aGrossWeightUnit string, aDescriptionOfGoods string,
+	/* aDescriptionPerPackage int, aMeasurement int, aMeasurementUnit string, aDeclaredCargoValueAmount int, aDeclaredCargoValueCurrency string,
+	   aAdditionalInformation string, aHazardousMaterial bool, aCustomerOrderNumber int*/) error {
+
+	// converting passed arguments from string to correct data type in the following block
+
+	convNumberBlIssued, converr := strconv.Atoi(aNumberOfBLIssued)
+	if converr != nil {
+		return fmt.Errorf("Error while converting aNumberOfBLIssued to int", converr.Error())
+	}
+
+	convNumberOfPackages, converr := strconv.Atoi(aNumberOfPackages)
+	if converr != nil {
+		return fmt.Errorf("Error while converting aNumberOfPackages to int", converr.Error())
+	}
+
+	convGrossWeight, converr := strconv.Atoi(aGrossWeight)
+	if converr != nil {
+		return fmt.Errorf("Error while converting aGrossWeight to int", converr.Error())
+	}
+
+	convNotifyPartySameAs, converr := strconv.ParseBool(aNotifyPartySameAs)
+	if converr != nil {
+		return fmt.Errorf("Error while converting aNotifyPartySameAs to bool", converr.Error())
+	}
+
+	convPrepaid, converr := strconv.ParseBool(aPrepaid)
+	if converr != nil {
+		return fmt.Errorf("Error while converting aPrepaid to bool", converr.Error())
+	}
+
+	convCollect, converr := strconv.ParseBool(aCollect)
+	if converr != nil {
+		return fmt.Errorf("Error while converting aCollect to bool", converr.Error())
+	}
+
+	convFullContainerLoad, converr := strconv.ParseBool(aFullContainerLoad)
+	if converr != nil {
+		return fmt.Errorf("Error while converting aFullContainerLoad to bool", converr.Error())
+	}
+
+	convLessThenContainerLoad, converr := strconv.ParseBool(aLessThenContainerLoad)
+	if converr != nil {
+		return fmt.Errorf("Error while converting aLessThenContainerLoad to bool", converr.Error())
+	}
+
+	// creation of new bl with all fields being initialization of the passed arguments as field data after some fields data type has been converted
 	bl := BillOfLading{
-		//change arguments for this function and the way the arguments are passed into a new BL struct, should look like this 
-		// BLNumber: blNumber,
-		// DateOfIssue: dateOfIssue;
-		
+		BLNumber:                    aBLNumber,
+		DateOfIssue:                 aDateOfIssue,
+		PlaceOfIssue:                aPlaceOfIssue,
+		NumberOfBLIssued:            convNumberBlIssued, //with converted datatype atoi (string to int)
+		ShipperName:                 aShipperName,       //5
+		ShipperAddress:              aShipperAddress,
+		ShipperContact:              aShipperContact,
+		ShipperLegalForm:            aShipperLegalForm,
+		ConsigneeName:               aConsigneeName,
+		ConsigneeAddress:            aConsigneeAddress, //10
+		ConsigneeContact:            aConsigneeContact,
+		ConsigneeLegalForm:          aConsigneeLegalForm,
+		CarrierName:                 aCarrierName,
+		CarrierAddress:              aCarrierAddress,
+		CarrierContact:              aCarrierContact, //15
+		CarrierLegalForm:            aCarrierLegalForm,
+		CarrierTrailerNumber:        aCarrierTrailerNumber,
+		AgentCompanyName:            aAgentCompanyName,
+		AgentCompanyLegalForm:       aAgentCompanyLegalForm,
+		AgentCompanyAddress:         aAgentCompanyLegalForm, //20
+		NotifyPartyCompanyName:      aNotifyPartyCompanyName,
+		NotifyPartyCompanyAddress:   aNotifyPartyCompanyAddress,
+		NotifyPartyCompanyLegalForm: aNotifyPartyCompanyLegalForm,
+		NotifyPartySameAs:           convNotifyPartySameAs, // with converted datatype parseBool (string to bool)
+		Incoterms:                   aIncoterms,            //25
+		FreightChargesCurrency:      aFreightChargesCurrency,
+		Prepaid:                     convPrepaid, // with converted datatype ParseBool (string to bool)
+		Collect:                     convCollect, // with converted datatype ParseBool (string to bool)
+		PortOfLoading:               aPortOfLoading,
+		PortOfDischarge:             aPortOfDischarge, //30
+		PlaceOfReceipt:              aPlaceOfReceipt,
+		PlaceOfDelivery:             aPlaceOfDelivery,
+		OceanVesselName:             aOceanVesselName,
+		ContainerNumber:             aContainerNumber,
+		FullContainerLoad:           convFullContainerLoad,     //35	 with converted datatype ParseBool (string to bool)
+		LessThenContainerLoad:       convLessThenContainerLoad, // with converted datatype ParseBool (string to bool)
+		DateofReceived:              aDateofReceived,
+		ShippedOnBoardDate:          aShippedOnBoardDate,
+		MarksAndNumbers:             aMarksAndNumbers,
+		NumberOfPackages:            convNumberOfPackages, //40		with converted datatype Atoi (string to int)
+		GrossWeight:                 convGrossWeight,      // with converted datatype Atoi (string to int)
+		GrossWeightUnit:             aGrossWeightUnit,
+		DescriptionOfGoods:          aDescriptionOfGoods,
+
+		/* removed these fields temporarily because of arugument limitation issue --> 47 args max */
+		// DescriptionPerPackage: aDescriptionPerPackage,
+		// Measurement: aMeasurement,
+		// MeasurementUnit: aMeasurementUnit,
+		// DeclaredCargoValueAmount: aDeclaredCargoValueAmount,
+		// DeclaredCargoValueCurrency: aDeclaredCargoValueCurrency,	//45
+		// AdditionalInformation: aAdditionalInformation,
+		// HazardousMaterial: aHazardousMaterial,
+		// CustomerOrderNumber: aCustomerOrderNumber,
 	}
 
 	blAsBytes, _ := json.Marshal(bl)
 
-	return ctx.GetStub().PutState(blNumber, blAsBytes)
+	return ctx.GetStub().PutState(aBLNumber, blAsBytes)
 }
 
-// QueryBl returns the car stored in the world state with given id
+// QueryBl returns the B/L stored in the world state with given id
 func (s *SmartContract) QueryBl(ctx contractapi.TransactionContextInterface, blNumber string) (*BillOfLading, error) {
 	blAsBytes, err := ctx.GetStub().GetState(blNumber)
 
@@ -297,7 +293,7 @@ func (s *SmartContract) QueryBl(ctx contractapi.TransactionContextInterface, blN
 	return bl, nil
 }
 
-// QueryAllBls returns all cars found in world state
+// QueryAllBls returns all B/L found in world state
 func (s *SmartContract) QueryAllBls(ctx contractapi.TransactionContextInterface) ([]QueryResult, error) {
 	startKey := ""
 	endKey := ""
@@ -347,6 +343,8 @@ func (s *SmartContract) ReturnBl() error{
 }
 
 */
+
+//changeBLOwner could be implemented with the endorsement of the BL
 
 // ChangeBlOwner updates the owner field of car with given id in world state
 /*

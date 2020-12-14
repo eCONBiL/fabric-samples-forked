@@ -9,6 +9,8 @@ eCONBiL - electronical Consignment and Bill of Lading
 
 changes made for an implementation of the Bill of Lading freight document
 
+B/L chaincode Beta Version 1.0
+
 This chaincode has 43 of the collected BL fields implemented and provides functions for initializing the ledger, querying specific B/Ls, querying
 all B/Ls from the ledger as well as creating a new B/L.
 The initialization-function creates one default B/L into the ledger.
@@ -28,7 +30,7 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-// SmartContract provides functions for managing a car
+// SmartContract provides functions for managing a B/L
 type SmartContract struct {
 	contractapi.Contract
 }

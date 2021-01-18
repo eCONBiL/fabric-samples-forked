@@ -90,7 +90,7 @@ func main() {
 			fmt.Println("B/L chaincode Beta Version 1.0 command line interface program")
 			fmt.Println()
 			fmt.Println("Use this program to interact with deployed chaincode")
-			fmt.Println("	--> the current chaincode beta version 1.0ß used chaincode is located in /fabric-samples/chaincode/fabcar/go/fabcar.go")
+			fmt.Println("	--> the current chaincode beta version 1.0 used chaincode is located in /fabric-samples/chaincode/fabcar/go/fabcar.go")
 			fmt.Println("Currently implemented functions for B/L chaincode are query, queryAll and create")
 			fmt.Println("Arguments are:")
 			fmt.Println("    queryAll")
@@ -171,7 +171,7 @@ func main() {
 				fmt.Println(string(result))
 
 			} else {
-				fmt.Println("44 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {NrOfBLIssued} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {DateOfRecieved} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods}]")
+				fmt.Println("44 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {NrOfBLIssued} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {DateOfRecieved} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods}]")
 
 				//Output loop for testing and monitoring purposes during development
 				// for i := 0; i < 45; i++ {

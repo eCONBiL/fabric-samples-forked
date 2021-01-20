@@ -161,14 +161,14 @@ func main() {
 				// fmt.Println(createArgGrossWeightUnit)
 				// fmt.Println(os.Args[44])
 
-				fmt.Println("Das B/L mit dem Schlüssel bzw. der BLNumber: ", createArgBlNr, " wurde im Ledger angelegt.")
-
 				result, err = contract.SubmitTransaction("createBl", createArgBlNr, createArgDoi, createArgPoi, createArgNoBl, createArgShName, createArgShAddr, createArgShCntct, createArgShLF, createArgCoName, createArgCoAddr, createArgCoCntct, createArgCoLF, createArgCrName, createArgCrAddr, createArgCrCntct, createArgCrLF, createArgCrTN, createArgACName, createArgACLF, createArgACAddr, createArgNPCName, createArgNPCAddr, createArgNPCLF, createArgNPCSame, createArgIncoterms, createArgFreightCC, createArgPrpd, createArgCllct, createArgPortOfLoading, createArgPortOfDischarge, createArgPlaceOfReceipt, createArgPlaceOfDelivery, createArgOVN, createArgContNr, createArgFullContLoad, createArgLessThenContLoad, createArgDtOfRecvd, createArgShippedOnBoardDate, createArgMrksNmbrs, createArgNrOfPkg, createArgGrossWeight, createArgGrossWeightUnit, createArgDscrOfGoods)
 				if err != nil {
 					fmt.Printf("Failed to submit transaction: %s\n", err)
 					os.Exit(1)
 				}
 				fmt.Println(string(result))
+
+				fmt.Println("Das B/L mit dem Schlüssel bzw. der BLNumber: ", createArgBlNr, " wurde im Ledger angelegt.")
 
 			} else {
 				fmt.Println("44 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {NrOfBLIssued} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {DateOfRecieved} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods}]")

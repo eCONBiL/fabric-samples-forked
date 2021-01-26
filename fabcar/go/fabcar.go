@@ -104,75 +104,37 @@ func main() {
 			fmt.Println(string(result))
 
 		} else if argument == "create" {
-			if len(os.Args) == 45 {
-				// ==> os.Args[0] = /tmp/go-build... --> default while reading arguments from os input
-				// ==> os.Args[1] = "create"
-				var createArgBlNr string = os.Args[2]
-				var createArgDoi string = os.Args[3]
-				var createArgPoi string = os.Args[4]
-				var createArgNoBl string = os.Args[5]
-				var createArgShName string = os.Args[6]
-				var createArgShAddr string = os.Args[7]
-				var createArgShCntct string = os.Args[8]
-				var createArgShLF string = os.Args[9]
-				var createArgCoName string = os.Args[10]
-				var createArgCoAddr string = os.Args[11]
-				var createArgCoCntct string = os.Args[12]
-				var createArgCoLF string = os.Args[13]
-				var createArgCrName string = os.Args[14]
-				var createArgCrAddr string = os.Args[15]
-				var createArgCrCntct string = os.Args[16]
-				var createArgCrLF string = os.Args[17]
-				var createArgCrTN string = os.Args[18]
-				var createArgACName string = os.Args[19]
-				var createArgACLF string = os.Args[20]
-				var createArgACAddr string = os.Args[21]
-				var createArgNPCName string = os.Args[22]
-				var createArgNPCAddr string = os.Args[23]
-				var createArgNPCLF string = os.Args[24]
-				var createArgNPCSame string = os.Args[25]
-				var createArgIncoterms string = os.Args[26]
-				var createArgFreightCC string = os.Args[27]
-				var createArgPrpd string = os.Args[28]
-				var createArgCllct string = os.Args[29]
-				var createArgPortOfLoading string = os.Args[30]
-				var createArgPortOfDischarge string = os.Args[31]
-				var createArgPlaceOfReceipt string = os.Args[32]
-				var createArgPlaceOfDelivery string = os.Args[33]
-				var createArgOVN string = os.Args[34]
-				var createArgContNr string = os.Args[35]
-				var createArgFullContLoad string = os.Args[36]
-				var createArgLessThenContLoad string = os.Args[37]
-				var createArgDtOfRecvd string = os.Args[38]
-				var createArgShippedOnBoardDate string = os.Args[39]
-				var createArgMrksNmbrs string = os.Args[40]
-				var createArgNrOfPkg string = os.Args[41]
-				var createArgGrossWeight string = os.Args[42]
-				var createArgGrossWeightUnit string = os.Args[43]
-				var createArgDscrOfGoods string = os.Args[44]
+			if len(os.Args) == 60 {
 
 				//Output loop for testing and monitoring purposes during development
-				for i := 0; i < 45; i++ {
+				for i := 0; i < len(os.Args); i++ {
 					fmt.Println("[", strconv.Itoa(i), "]", " ", os.Args[i])
 				}
-				// fmt.Println(createArgGrossWeightUnit)
-				// fmt.Println(os.Args[44])
 
-				result, err = contract.SubmitTransaction("createBl", createArgBlNr, createArgDoi, createArgPoi, createArgNoBl, createArgShName, createArgShAddr, createArgShCntct, createArgShLF, createArgCoName, createArgCoAddr, createArgCoCntct, createArgCoLF, createArgCrName, createArgCrAddr, createArgCrCntct, createArgCrLF, createArgCrTN, createArgACName, createArgACLF, createArgACAddr, createArgNPCName, createArgNPCAddr, createArgNPCLF, createArgNPCSame, createArgIncoterms, createArgFreightCC, createArgPrpd, createArgCllct, createArgPortOfLoading, createArgPortOfDischarge, createArgPlaceOfReceipt, createArgPlaceOfDelivery, createArgOVN, createArgContNr, createArgFullContLoad, createArgLessThenContLoad, createArgDtOfRecvd, createArgShippedOnBoardDate, createArgMrksNmbrs, createArgNrOfPkg, createArgGrossWeight, createArgGrossWeightUnit, createArgDscrOfGoods)
+				/*createArgBlNr, createArgDoi, createArgPoi, createArgNoBl, createArgShName, createArgShAddr, createArgShCntct, createArgShLF, createArgCoName, createArgCoAddr, createArgCoCntct, createArgCoLF, createArgCrName, createArgCrAddr, createArgCrCntct, createArgCrLF, createArgCrTN, createArgACName, createArgACLF, createArgACAddr, createArgNPCName, createArgNPCAddr, createArgNPCLF, createArgNPCSame, createArgIncoterms, createArgFreightCC, createArgPrpd, createArgCllct, createArgPortOfLoading, createArgPortOfDischarge, createArgPlaceOfReceipt, createArgPlaceOfDelivery, createArgOVN, createArgContNr, createArgFullContLoad, createArgLessThenContLoad, createArgDtOfRecvd, createArgShippedOnBoardDate, createArgMrksNmbrs, createArgNrOfPkg, createArgGrossWeight, createArgGrossWeightUnit, createArgDscrOfGoods*/
+
+				//converting cl input arguments to format with seperator which can be handled by the chaincode
+				blData := ""
+				sep := "_|_"
+
+				for j := 2; j < len(os.Args); j++ {
+					blData += os.Args[j]
+					if j != len(os.Args)-1 {
+						blData += sep
+					}
+				}
+
+				fmt.Println(blData)
+
+				result, err = contract.SubmitTransaction("createBl", blData)
 				if err != nil {
 					fmt.Printf("Failed to submit transaction: %s\n", err)
 					os.Exit(1)
 				}
 				fmt.Println(string(result))
-
+				fmt.Println("B/L with key / BLNumber: ", os.Args[2], "successfully created.")
 			} else {
-				fmt.Println("44 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {NrOfBLIssued} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {DateOfRecieved} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods}]")
-
-				//Output loop for testing and monitoring purposes during development
-				// for i := 0; i < 45; i++ {
-				// 	fmt.Println("[", strconv.Itoa(i), "]", " ", os.Args[i])
-				// }
-				// fmt.Println("length of args: ", len(os.Args))
+				fmt.Println("59 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {NrOfBLIssued} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {DateOfRecieved} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods} {DescriptionPerPackage} {Measurement} {MeasurementUnit} {DeclaredCargoValueAmount} {DeclaredCargoValueCurrency} {AdditionalInformation} {HazardousMaterial} {CustomerOrderNumber} {TransportConditions} {ApplieableLaw} {PlaceOfJurisdiction} {CurrentOwner} {OrderBy} {OrderTo} {OrderAt}]")
 			}
 		} else if argument == "query" {
 			if len(os.Args) == 3 {

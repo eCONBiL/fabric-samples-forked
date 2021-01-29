@@ -1,1 +1,20 @@
-go run fabcar.go create "EI QOEG 5584" "17/08/2020" "Guri-si" "3" "Larson and Sons" "314 Johnson Parkway" "nweir0@miitbeian.gov.cn" "UGSE" "Ryan, Lubowitz and Hudson" "895 Bonner Plaza" "nferretti0@wisc.edu" "RHFL" "DuBuque, Beahan and Kertzmann" "091 Bluejay Center" "278-441-5342" "WLCY" "QE-CI-255" "Prohaska Inc" "Inc" "49601 Westerfield Place" "Tagcat" "4737 Hazelcrest Court" "WOND" "false" "" "KRW" "true" "true" "Priekule" "Irkutsk" "5118 Monterey Crossing" "7 Moland Terrace" "Natalee" "BICU1234567" "false" "true" "27/03/2020" "12/09/2020" "Aenean sit amet justo" "7454" "21143" "kg" "Aenean sit amet justo" "DescrPerPackage" "22.4" "MsrmntUnit" "23" "DCVC" "AI" "false" "1210143" "TC" "ApplLaw" "POJ" "CurrOwner" "Oby" "Oto" "Oat"
+zuerst create: 
+go run fabcar.go create "EI QOEG 5584" "17/08/2020" "Guri-si" "3" "Larson and Sons" "314 Johnson Parkway" "nweir0@miitbeian.gov.cn" "UGSE" "Ryan, Lubowitz and Hudson" "895 Bonner Plaza" "nferretti0@wisc.edu" "RHFL" "DuBuque, Beahan and Kertzmann" "091 Bluejay Center" "278-441-5342" "WLCY" "QE-CI-255" "Prohaska Inc" "Inc" "49601 Westerfield Place" "Tagcat" "4737 Hazelcrest Court" "WOND" "Incoterms" "KRW" "true" "true" "Priekule" "Irkutsk" "5118 Monterey Crossing" "7 Moland Terrace" "Natalee" "BICU1234567" "false" "true" "" "" "Aenean sit amet justo" "7454" "21143" "kg" "Aenean sit amet justo" "DescrPerPackage" "22.4" "MsrmntUnit" "23" "DCVC" "AI" "false" "1210143" "TC" "ApplLaw" "POJ" "Oby" "Oto" "Oat"
+
+#endorsement
+go run fabcar.go endorsement "EI QOEG 5584" "" "" "" "Julian" "MSC Germany S.A. \u0026 Co. KG."
+
+#depreciation
+go run fabcar.go depreciation "EI QOEG 5584" "5" "123" "kg" "newDescriptionOfGoods" "newDescrPPkg" "20.07" "m3" "1999" "USD" "additional" "false"
+
+#changeOceanVessel
+go run fabcar.go changeOceanVessel "EI QOEG 5584" "Maria"
+
+#redirectContainer
+go run fabcar.go redirectContainer "EI QOEG 5584" "An der Karlstadt 8, 27568 Bremerhaven"
+
+#load (when shipped on board)
+go run fabcar.go load "EI QOEG 5584"
+
+#returnWithoutLoading
+go run fabcar.go returnWithoutLoading "EI QOEG 5584"

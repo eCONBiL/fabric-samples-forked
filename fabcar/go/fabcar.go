@@ -104,7 +104,7 @@ func main() {
 			fmt.Println(string(result))
 
 		} else if argument == "create" {
-			if len(os.Args) == 60 {
+			if len(os.Args) == 58 {
 
 				//Output loop for testing and monitoring purposes during development
 				for i := 0; i < len(os.Args); i++ {
@@ -134,7 +134,10 @@ func main() {
 				fmt.Println(string(result))
 				fmt.Println("B/L with key / BLNumber: ", os.Args[2], "successfully created.")
 			} else {
-				fmt.Println("59 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {NrOfBLIssued} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {DateOfRecieved} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods} {DescriptionPerPackage} {Measurement} {MeasurementUnit} {DeclaredCargoValueAmount} {DeclaredCargoValueCurrency} {AdditionalInformation} {HazardousMaterial} {CustomerOrderNumber} {TransportConditions} {ApplieableLaw} {PlaceOfJurisdiction} {CurrentOwner} {OrderBy} {OrderTo} {OrderAt}]")
+				fmt.Println("57 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {NrOfBLIssued} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {DateOfRecieved} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods} {DescriptionPerPackage} {Measurement} {MeasurementUnit} {DeclaredCargoValueAmount} {DeclaredCargoValueCurrency} {AdditionalInformation} {HazardousMaterial} {CustomerOrderNumber} {TransportConditions} {ApplieableLaw} {PlaceOfJurisdiction} {CurrentOwner} {OrderBy} {OrderTo} {OrderAt}]")
+				fmt.Println("Values {CargoRecievedDate} and {ShippedOnBoardDate} are intepreted as empty strings")
+				fmt.Println("Your input: ", os.Args)
+				fmt.Println("Your input length: ", len(os.Args))
 			}
 		} else if argument == "query" {
 			if len(os.Args) == 3 {
@@ -149,23 +152,110 @@ func main() {
 			} else {
 				fmt.Println("2 Arguments expected  |  go run fabcar-mod.go [query {BLNumber}]")
 			}
-			// } else if argument == "changeOwner" {
-			// 	if len(os.Args) == 4 {
-			// 		var changeArgID string = os.Args[2]
-			// 		var changeArgOw string = os.Args[3]
-			// 		_, err = contract.SubmitTransaction("changeBlOwner", changeArgID, changeArgOw)
-			// 		if err != nil {
-			// 			fmt.Printf("Failed to submit transaction: %s\n", err)
-			// 			os.Exit(1)
-			// 		}
-			// 	} else {
-			// 		fmt.Println("3 Arguments expected  |  go run fabcar-mod.go [changeOwner {BLID} {NEWBLOWNER}]")
-			// 	}
+
+		} else if argument == "endorsement" {
+			if len(os.Args) == 8 {
+				var blN = os.Args[2]
+				var NPCN = os.Args[3]
+				var NPCA = os.Args[4]
+				var NPCLF = os.Args[5]
+				var OT = os.Args[6]
+				var OA = os.Args[7]
+
+				fmt.Println(blN, NPCN, NPCA, NPCLF, OT, OA)
+
+				result, err = contract.SubmitTransaction("TransferBl", blN, NPCN, NPCA, NPCLF, OT, OA)
+				if err != nil {
+					fmt.Printf("Failed to evaluate transaction during endorsement: %s\n", err)
+					os.Exit(1)
+				}
+				fmt.Println("Endorsement successfully executed - new Owner (OrderTo) is : ", OT)
+			} else {
+				fmt.Println("Wrong input for endorsement |  should be: endorsement blNumber NPCN NPCA NPCLF OT OA")
+			}
+		} else if argument == "depreciation" {
+			if len(os.Args) == 14 {
+				var bln = os.Args[2]
+				var newNPKG = os.Args[3]
+				var newGrossWeight = os.Args[4]
+				var newGrossWeightUnit = os.Args[5]
+				var newDOG = os.Args[6]
+				var newDPP = os.Args[7]
+				var newMeasurement = os.Args[8]
+				var newMeasurementUnit = os.Args[9]
+				var newDCVA = os.Args[10]
+				var newDCVC = os.Args[11]
+				var newAI = os.Args[12]
+				var newHM = os.Args[13]
+
+				fmt.Println(bln, newNPKG, newGrossWeight, newGrossWeightUnit, newDOG, newDPP, newMeasurement, newMeasurementUnit, newDCVA, newDCVC, newAI, newHM)
+				result, err = contract.SubmitTransaction("DepreciationOfBl", bln, newNPKG, newGrossWeight, newGrossWeightUnit, newDOG, newDPP, newMeasurement, newMeasurementUnit, newDCVA, newDCVC, newAI, newHM)
+				if err != nil {
+					fmt.Printf("Failed to evaluate transaction during depreciation: %s\n", err)
+					os.Exit(1)
+				}
+				fmt.Println("Depreciation successfully executed - issue 'go run fabcar.go query ", bln, "' to see the result")
+
+			} else {
+				fmt.Println("Wrong input for depreciation |  should be: depreciation blNumber newNrPKG newGrossWeight newGrossWeightUnit newDOG newDPP newMeasurement newMeasurementUnit newDCVA newDCVC newAI newHM")
+			}
+		} else if argument == "changeOceanVessel" {
+			if len(os.Args) == 4 {
+				var blnr = os.Args[2]
+				var newShip = os.Args[3]
+				result, err = contract.SubmitTransaction("ChangeOceanVessel", blnr, newShip)
+				if err != nil {
+					fmt.Printf("Failed to evaluate transaction during change of ocean vessel name: %s\n", err)
+					os.Exit(1)
+				}
+				fmt.Println("change of ocean vessel name successfully executed  - issue 'go run fabcar.go query ", blnr, "' to see the result")
+				fmt.Println(blnr)
+			} else {
+				fmt.Println("Wrong input for changeOceanVessel | should be: changeOceanVessel blNumber newOceanVesselName")
+			}
+
+		} else if argument == "redirectContainer" {
+			if len(os.Args) == 4 {
+				var blnr = os.Args[2]
+				var newDest = os.Args[3]
+				result, err = contract.SubmitTransaction("RedirectContainer", blnr, newDest)
+				if err != nil {
+					fmt.Printf("Failed to evaluate transaction during redirection of container: %s\n", err)
+					os.Exit(1)
+				}
+				fmt.Println("container redirection successfully executed  - issue 'go run fabcar.go query ", blnr, "' to see the result")
+			} else {
+				fmt.Println("Wrong input for redirectContainer | should be: redirectContainer blNumber newDestination")
+			}
+
+		} else if argument == "returnWithoutLoading" {
+			if len(os.Args) == 3 {
+				result, err = contract.SubmitTransaction("ReturnBlWithoutLoading", os.Args[2])
+				if err != nil {
+					fmt.Printf("Failed to evaluate transaction during return of B/L without loading: %s\n", err)
+					os.Exit(1)
+				}
+				fmt.Println("return without loading successfully executed  - issue 'go run fabcar.go query ", os.Args[2], "' to see the result")
+			} else {
+				fmt.Println("Wrong input for returnWithoutLoading | should be: returnWithoutLoading blNumber")
+			}
+
+		} else if argument == "load" {
+			if len(os.Args) == 3 {
+				result, err = contract.SubmitTransaction("LoadOnBoard", os.Args[2])
+				if err != nil {
+					fmt.Printf("Failed to evaluate transaction during loading on board: %s\n", err)
+					os.Exit(1)
+				}
+				fmt.Println("loading on board successfully executed  - issue 'go run fabcar.go query ", os.Args[2], "' to see the result")
+			} else {
+				fmt.Println("Wrong input for load | should be: load blNumber")
+			}
 		} else {
-			fmt.Println("No valid argument | try: queryAll , create , query, help")
+			fmt.Println("No valid argument | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, redirectContainer, load, returnWithoutLoading")
 		}
 	} else {
-		fmt.Println("Missing argument(s) | try: queryAll , create , query, help")
+		fmt.Println("Missing argument(s) | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, redirectContainer, load, returnWithoutLoading")
 	}
 }
 

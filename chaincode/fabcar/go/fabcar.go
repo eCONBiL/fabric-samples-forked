@@ -291,9 +291,9 @@ func (s *SmartContract) CreateBl(ctx contractapi.TransactionContextInterface, BL
 		TransportConditions:         splitResult[50],
 		ApplieableLaw:               splitResult[51],
 		PlaceOfJurisdiction:         splitResult[52],
-		OrderDate:                   splitResult[53],
-		OrderTo:                     splitResult[54],
-		OrderAt:                     splitResult[55],
+		OrderDate:                   splitResult[53], //should be empty in first creation because no endorsement has been issued yet
+		OrderTo:                     splitResult[54], //should be empty in first creation because no endorsement has been issued yet
+		OrderAt:                     splitResult[55], //should be empty in first creation because no endorsement has been issued yet
 		BlTransferable:              true,
 	}
 
@@ -435,7 +435,18 @@ func (s *SmartContract) TransferBl(ctx contractapi.TransactionContextInterface, 
 		return err
 	}
 
-	if bl.BlTransferable == true && bl.OrderTo == bl.CarrierName { //if OrderTo == carrier
+	//check if orderAt party is authorized to issue endorsement
+	if bl.OrderTo == "" {
+		if OA != bl.CarrierName {
+			return fmt.Errorf("only the carrier can issue the first endorsement. Last argument must be equal to CarrierName")
+		}
+	} else {
+		if OA != bl.OrderTo {
+			return fmt.Errorf("The given OrderAt Party is not the current Owner and not authorised to issue an endorsement. -- current OrderAt: ", bl.OrderAt)
+		}
+	}
+
+	if bl.BlTransferable == true && bl.OrderTo == bl.CarrierName {
 		bl.BlTransferable = false
 	}
 
@@ -454,7 +465,7 @@ func (s *SmartContract) TransferBl(ctx contractapi.TransactionContextInterface, 
 
 	bl.OrderDate = formattedDate
 	bl.OrderTo = OT // nächsterInhaber
-	bl.OrderAt = OA // Inhaber
+	bl.OrderAt = OA // ÜberschreibendePartei
 
 	blAsBytes, _ := json.Marshal(bl)
 

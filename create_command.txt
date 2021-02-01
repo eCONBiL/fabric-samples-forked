@@ -1,8 +1,20 @@
-zuerst create: 
-go run fabcar.go create "EI QOEG 5584" "17/08/2020" "Guri-si" "3" "Larson and Sons" "314 Johnson Parkway" "nweir0@miitbeian.gov.cn" "UGSE" "Ryan, Lubowitz and Hudson" "895 Bonner Plaza" "nferretti0@wisc.edu" "RHFL" "DuBuque, Beahan and Kertzmann" "091 Bluejay Center" "278-441-5342" "WLCY" "QE-CI-255" "Prohaska Inc" "Inc" "49601 Westerfield Place" "Tagcat" "4737 Hazelcrest Court" "WOND" "Incoterms" "KRW" "true" "true" "Priekule" "Irkutsk" "5118 Monterey Crossing" "7 Moland Terrace" "Natalee" "BICU1234567" "false" "true" "" "" "Aenean sit amet justo" "7454" "21143" "kg" "Aenean sit amet justo" "DescrPerPackage" "22.4" "MsrmntUnit" "23" "DCVC" "AI" "false" "1210143" "TC" "ApplLaw" "POJ" "Oby" "Oto" "Oat"
+#alles ausführen aus dem verzeichnis: /fabric-samples/fabcar/go
+#nach dem erzeugen umbenannter dateien kann das "fabcar.go" nach den gelisteten befehlen auch durch "bl_appl_local.go" oder "bl_appl_server.go" ersetzt werden
+
+#zuerst create: 
+go run fabcar.go create "EI QOEG 5584" "17/08/2020" "Guri-si" "3" "Larson and Sons" "314 Johnson Parkway" "nweir0@miitbeian.gov.cn" "UGSE" "Ryan, Lubowitz and Hudson" "895 Bonner Plaza" "nferretti0@wisc.edu" "RHFL" "DuBuque, Beahan and Kertzmann" "091 Bluejay Center" "278-441-5342" "WLCY" "QE-CI-255" "Prohaska Inc" "Inc" "49601 Westerfield Place" "Tagcat" "4737 Hazelcrest Court" "WOND" "Incoterms" "KRW" "true" "true" "Priekule" "Irkutsk" "5118 Monterey Crossing" "7 Moland Terrace" "Natalee" "BICU1234567" "false" "true" "" "" "Aenean sit amet justo" "7454" "21143" "kg" "Aenean sit amet justo" "DescrPerPackage" "22.4" "MsrmntUnit" "23" "DCVC" "AI" "false" "1210143" "TC" "ApplLaw" "POJ" "" "" ""
 
 #endorsement
-go run fabcar.go endorsement "EI QOEG 5584" "" "" "" "Julian" "MSC Germany S.A. \u0026 Co. KG."
+#hierbei wird erstes gültiges endorsement immer vom carrier ausgeführt (CarrierName als letztes Argument)
+#alle weiteren endorsements sind nur gültig, wenn sie von der Partei ausgeführt werden, die im vorherigen endorsement das BL überschrieben bekommen hat (orderTo)
+#endorsement ist auch ungültig, wenn das bl bereits an den carrier zurückgegeben wurde (wenn carrier ein zweites mal oderTo ist)
+#Beim erzeugen eines Bls sollten die 3 letzten Felder (für das indossament) als leere Strings übergeben werden!
+
+    #initiales endorsement
+    go run fabcar.go endorsement "EI QOEG 5584" "" "" "" "Julian" "DuBuque, Beahan and Kertzmann"
+
+    #Beispiel für Rückgabe an Carrier
+    go run fabcar.go endorsement "EI QOEG 5584" "" "" "" "DuBuque, Beahan and Kertzmann" "Julian"
 
 #depreciation
 go run fabcar.go depreciation "EI QOEG 5584" "5" "123" "kg" "newDescriptionOfGoods" "newDescrPPkg" "20.07" "m3" "1999" "USD" "additional" "false"
@@ -18,3 +30,6 @@ go run fabcar.go load "EI QOEG 5584"
 
 #returnWithoutLoading
 go run fabcar.go returnWithoutLoading "EI QOEG 5584"
+
+#Befehl zum Prüfen der "Blockchain-Höhe" und blockhashes 
+docker exec peer0.org1.example.com peer channel getinfo -c mychannel

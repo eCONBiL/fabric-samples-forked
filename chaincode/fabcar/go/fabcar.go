@@ -41,10 +41,9 @@ type SmartContract struct {
 type BillOfLading struct {
 
 	// BL Info Fields
-	BLNumber         string `json:"BLNumber"`
-	DateOfIssue      string `json:"DateOfIssue"`
-	PlaceOfIssue     string `json:"PlaceOfIssue"`
-	NumberOfBLIssued int    `json:"NumberOfBLIssued"`
+	BLNumber     string `json:"BLNumber"`
+	DateOfIssue  string `json:"DateOfIssue"`
+	PlaceOfIssue string `json:"PlaceOfIssue"`
 
 	//Shipper information
 	ShipperName      string `json:"ShipperName"` //5
@@ -92,7 +91,6 @@ type BillOfLading struct {
 	ContainerNumber       string `json:"ContainerNumber"`
 	FullContainerLoad     bool   `json:"FullContainerLoad"`
 	LessThenContainerLoad bool   `json:"LessThenContainerLoad"` //35
-	CargoRecievedDate     string `json:"CargoRecievedDate"`
 	ShippedOnBoardDate    string `json:"ShippedOnBoardDate"`
 
 	//Gross info
@@ -110,7 +108,7 @@ type BillOfLading struct {
 	HazardousMaterial          bool    `json:"HazardousMaterial"`
 
 	// CustomerOrderNumber
-	CustomerOrderNumber int `json:"CustomerOrderNumber"` //50
+	CustomerOrderNumber string `json:"CustomerOrderNumber"` //50
 
 	//Used Conditions (ERA600, Art. 20 a)
 	TransportConditions string `json:"TransportConditions"`
@@ -121,6 +119,7 @@ type BillOfLading struct {
 	OrderDate      string `json:"OrderDate"`
 	OrderTo        string `json:"OrderTo"` //55
 	OrderAt        string `json:"OrderAt"`
+	OrderCheckbox  bool   `json:"OrderCheckbox"`
 	BlTransferable bool   `json: "BlTransferable"`
 }
 
@@ -133,7 +132,7 @@ type QueryResult struct {
 // InitLedger adds a base set of BL to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	bls := []BillOfLading{
-		BillOfLading{BLNumber: "TW ECON 1000", DateOfIssue: "10.11.2020", PlaceOfIssue: "Bremerhaven", NumberOfBLIssued: 2,
+		BillOfLading{BLNumber: "TW ECON 1000", DateOfIssue: "10.11.2020", PlaceOfIssue: "Bremerhaven",
 			ShipperName: "Autohaus Main GmbH", ShipperAddress: "Hanauerlandstr. 3460314 Frankfurt, Germany", ShipperContact: "ahmain@beispiel.de", ShipperLegalForm: "GmbH",
 			ConsigneeName: "German-Cars Ldt.", ConsigneeAddress: "Fue Avenue, A1 518108 Shanghai, China", ConsigneeContact: "86282452253", ConsigneeLegalForm: "Ldt.",
 			CarrierName: "MSC Germany S.A. & Co. KG", CarrierAddress: "Hafenstraße 55, 282127 Bremen, Germany", CarrierContact: "deu-bremen@msc.de", CarrierLegalForm: "S.A. & Co. KG", CarrierTrailerNumber: "HB-KK-596",
@@ -141,14 +140,15 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 			NotifyPartyCompanyName: "German-Cars Ldt.", NotifyPartyCompanyAddress: "Fue Avenue, A1 518108 Shanghai, China", NotifyPartyCompanyLegalForm: "Ldt.",
 			Incoterms:              "FOB (2020)",
 			FreightChargesCurrency: "USD", Prepaid: true, Collect: true,
-			PortOfLoading: "Bremerhaven Containerterminal", PortOfDischarge: "Shanghai Yangshan", PlaceOfReceipt: "Frankfurt am Main, Adresse, Germany", PlaceOfDelivery: "Shanghai, Adresse, China", OceanVesselName: "MSC Gulsun", ContainerNumber: "OOLU1548378", FullContainerLoad: true, LessThenContainerLoad: false, CargoRecievedDate: "", ShippedOnBoardDate: "",
+			PortOfLoading: "Bremerhaven Containerterminal", PortOfDischarge: "Shanghai Yangshan", PlaceOfReceipt: "Frankfurt am Main, Adresse, Germany", PlaceOfDelivery: "Shanghai, Adresse, China", OceanVesselName: "MSC Gulsun", ContainerNumber: "OOLU1548378", FullContainerLoad: true, LessThenContainerLoad: false, ShippedOnBoardDate: "02.02.2021",
 			MarksAndNumbers: "40' steel Dry Cargo Container No CSQU3054383", NumberOfPackages: 15, GrossWeight: 4250, GrossWeightUnit: "Kg", DescriptionOfGoods: "engines and fitting engine parts packaged together on pallets", DescriptionPerPackage: "abc", Measurement: 40.2, MeasurementUnit: "Feet", DeclaredCargoValueAmount: 75000, DeclaredCargoValueCurrency: "USD", AdditionalInformation: "-", HazardousMaterial: false,
-			CustomerOrderNumber: 1,
+			CustomerOrderNumber: "CO NR 1234",
 			TransportConditions: "TransportCond", ApplieableLaw: "ApplLaw", PlaceOfJurisdiction: "POJ",
 			OrderDate:      "",
 			OrderTo:        "",
 			OrderAt:        "",
-			BlTransferable: true,
+			OrderCheckbox:  false,
+			BlTransferable: false,
 		},
 	}
 
@@ -181,59 +181,60 @@ func (s *SmartContract) CreateBl(ctx contractapi.TransactionContextInterface, BL
 
 	// converting passed arguments from string to correct data type in the following block
 
-	convNumberBlIssued, converr := strconv.Atoi(splitResult[3])
+	//prepaid and collect are preset for letter of credit
+	convPrepaid, converr := strconv.ParseBool(splitResult[24])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aNumberOfBLIssued to int", converr.Error())
+		return fmt.Errorf("Error while converting Prepaid to bool", converr.Error())
 	}
 
-	convPrepaid, converr := strconv.ParseBool(splitResult[25])
+	convCollect, converr := strconv.ParseBool(splitResult[25])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aPrepaid to bool", converr.Error())
+		return fmt.Errorf("Error while converting Collect to bool", converr.Error())
 	}
 
-	convCollect, converr := strconv.ParseBool(splitResult[26])
+	convFullContainerLoad, converr := strconv.ParseBool(splitResult[32])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aCollect to bool", converr.Error())
+		return fmt.Errorf("Error while converting FullContainerLoad to bool", converr.Error())
 	}
 
-	convFullContainerLoad, converr := strconv.ParseBool(splitResult[33])
+	convLessThenContainerLoad, converr := strconv.ParseBool(splitResult[33])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aFullContainerLoad to bool", converr.Error())
+		return fmt.Errorf("Error while converting LessThenContainerLoad to bool", converr.Error())
 	}
 
-	convLessThenContainerLoad, converr := strconv.ParseBool(splitResult[34])
+	convNumberOfPackages, converr := strconv.Atoi(splitResult[36])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aLessThenContainerLoad to bool", converr.Error())
+		return fmt.Errorf("Error while converting NumberOfPackages to int", converr.Error())
 	}
 
-	convNumberOfPackages, converr := strconv.Atoi(splitResult[38])
+	convGrossWeight, converr := strconv.Atoi(splitResult[37])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aNumberOfPackages to int", converr.Error())
+		return fmt.Errorf("Error while converting GrossWeight to int", converr.Error())
 	}
 
-	convGrossWeight, converr := strconv.Atoi(splitResult[39])
+	convMeasurement, converr := strconv.ParseFloat(splitResult[41], 64)
 	if converr != nil {
-		return fmt.Errorf("Error while converting aGrossWeight to int", converr.Error())
+		return fmt.Errorf("Error while converting Measurement to float", converr.Error())
 	}
 
-	convMeasurement, converr := strconv.ParseFloat(splitResult[43], 64)
+	convDeclaredCargoValueAmount, converr := strconv.Atoi(splitResult[43])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aMeasurement to float", converr.Error())
+		return fmt.Errorf("Error while converting DeclaredCargoValueAmount to int", converr.Error())
 	}
 
-	convDeclaredCargoValueAmount, converr := strconv.Atoi(splitResult[45])
+	convHazardousMaterial, converr := strconv.ParseBool(splitResult[46])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aDeclaredCargoValueAmount to int", converr.Error())
+		return fmt.Errorf("Error while converting HazardousMaterial to bool", converr.Error())
 	}
 
-	convHazardousMaterial, converr := strconv.ParseBool(splitResult[48])
-	if converr != nil {
-		return fmt.Errorf("Error while converting aHazardousMaterial to bool", converr.Error())
-	}
+	// convCustomerOrderNumber, converr := strconv.Atoi(splitResult[48])
+	// if converr != nil {
+	// 	return fmt.Errorf("Error while converting aCustomerOrderNumber to int", converr.Error())
+	// }
 
-	convCustomerOrderNumber, converr := strconv.Atoi(splitResult[49])
+	convOrderCheckbox, converr := strconv.ParseBool(splitResult[54])
 	if converr != nil {
-		return fmt.Errorf("Error while converting aCustomerOrderNumber to int", converr.Error())
+		return fmt.Errorf("Error while converting OrderCheckbox to bool", converr.Error())
 	}
 
 	// creation of new bl with all fields being initialization of the passed arguments as field data after some fields data type has been converted
@@ -241,60 +242,63 @@ func (s *SmartContract) CreateBl(ctx contractapi.TransactionContextInterface, BL
 		BLNumber:                    splitResult[0],
 		DateOfIssue:                 splitResult[1],
 		PlaceOfIssue:                splitResult[2],
-		NumberOfBLIssued:            convNumberBlIssued, //with converted datatype atoi (string to int)
-		ShipperName:                 splitResult[4],
-		ShipperAddress:              splitResult[5],
-		ShipperContact:              splitResult[6],
-		ShipperLegalForm:            splitResult[7],
-		ConsigneeName:               splitResult[8],
-		ConsigneeAddress:            splitResult[9],
-		ConsigneeContact:            splitResult[10],
-		ConsigneeLegalForm:          splitResult[11],
-		CarrierName:                 splitResult[12],
-		CarrierAddress:              splitResult[13],
-		CarrierContact:              splitResult[14],
-		CarrierLegalForm:            splitResult[15],
-		CarrierTrailerNumber:        splitResult[16],
-		AgentCompanyName:            splitResult[17],
-		AgentCompanyLegalForm:       splitResult[18],
-		AgentCompanyAddress:         splitResult[19],
-		NotifyPartyCompanyName:      splitResult[20],
-		NotifyPartyCompanyAddress:   splitResult[21],
-		NotifyPartyCompanyLegalForm: splitResult[22],
-		Incoterms:                   splitResult[23],
-		FreightChargesCurrency:      splitResult[24],
+		ShipperName:                 splitResult[3],
+		ShipperAddress:              splitResult[4],
+		ShipperContact:              splitResult[5],
+		ShipperLegalForm:            splitResult[6],
+		ConsigneeName:               splitResult[7],
+		ConsigneeAddress:            splitResult[8],
+		ConsigneeContact:            splitResult[9],
+		ConsigneeLegalForm:          splitResult[10],
+		CarrierName:                 splitResult[11],
+		CarrierAddress:              splitResult[12],
+		CarrierContact:              splitResult[13],
+		CarrierLegalForm:            splitResult[14],
+		CarrierTrailerNumber:        splitResult[15],
+		AgentCompanyName:            splitResult[16],
+		AgentCompanyLegalForm:       splitResult[17],
+		AgentCompanyAddress:         splitResult[18],
+		NotifyPartyCompanyName:      splitResult[19],
+		NotifyPartyCompanyAddress:   splitResult[20],
+		NotifyPartyCompanyLegalForm: splitResult[21],
+		Incoterms:                   splitResult[22],
+		FreightChargesCurrency:      splitResult[23],
 		Prepaid:                     convPrepaid, // with converted datatype ParseBool (string to bool)
 		Collect:                     convCollect, // with converted datatype ParseBool (string to bool)
-		PortOfLoading:               splitResult[27],
-		PortOfDischarge:             splitResult[28],
-		PlaceOfReceipt:              splitResult[29],
-		PlaceOfDelivery:             splitResult[30],
-		OceanVesselName:             splitResult[31],
-		ContainerNumber:             splitResult[32],
+		PortOfLoading:               splitResult[26],
+		PortOfDischarge:             splitResult[27],
+		PlaceOfReceipt:              splitResult[28],
+		PlaceOfDelivery:             splitResult[29],
+		OceanVesselName:             splitResult[30],
+		ContainerNumber:             splitResult[31],
 		FullContainerLoad:           convFullContainerLoad,     // with converted datatype ParseBool (string to bool)
 		LessThenContainerLoad:       convLessThenContainerLoad, // with converted datatype ParseBool (string to bool)
-		CargoRecievedDate:           "",                        // splitResult[35],
-		ShippedOnBoardDate:          "",                        //splitResult[36],
-		MarksAndNumbers:             splitResult[37],
+		ShippedOnBoardDate:          splitResult[34],           //splitResult[36],
+		MarksAndNumbers:             splitResult[35],
 		NumberOfPackages:            convNumberOfPackages, // with converted datatype Atoi (string to int)
 		GrossWeight:                 convGrossWeight,      // with converted datatype Atoi (string to int)
-		GrossWeightUnit:             splitResult[40],
-		DescriptionOfGoods:          splitResult[41],
-		DescriptionPerPackage:       splitResult[42],
+		GrossWeightUnit:             splitResult[38],
+		DescriptionOfGoods:          splitResult[39],
+		DescriptionPerPackage:       splitResult[40],
 		Measurement:                 convMeasurement, // with converted datatype ParseFloat (string to float32)
-		MeasurementUnit:             splitResult[44],
+		MeasurementUnit:             splitResult[42],
 		DeclaredCargoValueAmount:    convDeclaredCargoValueAmount, // with converted datatype atoi (string to int)
-		DeclaredCargoValueCurrency:  splitResult[46],
-		AdditionalInformation:       splitResult[47],
-		HazardousMaterial:           convHazardousMaterial,   // with converted datatype parseBool (string to bool)
-		CustomerOrderNumber:         convCustomerOrderNumber, // with converted datatype atoi (string to int)
-		TransportConditions:         splitResult[50],
-		ApplieableLaw:               splitResult[51],
-		PlaceOfJurisdiction:         splitResult[52],
-		OrderDate:                   splitResult[53], //should be empty in first creation because no endorsement has been issued yet
-		OrderTo:                     splitResult[54], //should be empty in first creation because no endorsement has been issued yet
-		OrderAt:                     splitResult[55], //should be empty in first creation because no endorsement has been issued yet
+		DeclaredCargoValueCurrency:  splitResult[44],
+		AdditionalInformation:       splitResult[45],
+		HazardousMaterial:           convHazardousMaterial, // with converted datatype parseBool (string to bool)
+		CustomerOrderNumber:         splitResult[47],       // with converted datatype atoi (string to int)
+		TransportConditions:         splitResult[48],
+		ApplieableLaw:               splitResult[49],
+		PlaceOfJurisdiction:         splitResult[50],
+		OrderDate:                   splitResult[51], //should be empty in first creation because no endorsement has been issued yet
+		OrderTo:                     splitResult[52], //should be empty in first creation because no endorsement has been issued yet
+		OrderAt:                     splitResult[53], //should be empty in first creation because no endorsement has been issued yet
+		OrderCheckbox:               convOrderCheckbox,
 		BlTransferable:              true,
+	}
+
+	if bl.OrderCheckbox == false {
+		bl.BlTransferable = false
 	}
 
 	blAsBytes, _ := json.Marshal(bl)
@@ -302,6 +306,7 @@ func (s *SmartContract) CreateBl(ctx contractapi.TransactionContextInterface, BL
 	//write Bl in correct format on blockchain
 
 	return ctx.GetStub().PutState(splitResult[0], blAsBytes)
+
 }
 
 // QueryBl returns the B/L stored in the world state with given id
@@ -370,42 +375,42 @@ func (s *SmartContract) ChangeOceanVessel(ctx contractapi.TransactionContextInte
 }
 
 //RedirectContainer function for redirecting a container to a new destination
-func (s *SmartContract) RedirectContainer(ctx contractapi.TransactionContextInterface, blNumber string, newDestination string) error {
+// func (s *SmartContract) RedirectContainer(ctx contractapi.TransactionContextInterface, blNumber string, newDestination string) error {
 
-	bl, err := s.QueryBl(ctx, blNumber)
+// 	bl, err := s.QueryBl(ctx, blNumber)
 
-	if err != nil {
-		return err
-	}
-	bl.PlaceOfDelivery = newDestination
+// 	if err != nil {
+// 		return err
+// 	}
+// 	bl.PlaceOfDelivery = newDestination
 
-	blAsBytes, _ := json.Marshal(bl)
+// 	blAsBytes, _ := json.Marshal(bl)
 
-	return ctx.GetStub().PutState(blNumber, blAsBytes)
-}
+// 	return ctx.GetStub().PutState(blNumber, blAsBytes)
+// }
 
 // ReturnBlWithoutLoading kann in WebUi als bool bzw. Checkbox gebaut werden
-// ReturnBlWithoutLoading sets CargoRecievedDate as return of container before loading it on a ship
-func (s *SmartContract) ReturnBlWithoutLoading(ctx contractapi.TransactionContextInterface, blNumber string) error {
+// ReturnBlWithoutLoading sets CargoReceivedDate as return of container before loading it on a ship
+// func (s *SmartContract) ReturnBlWithoutLoading(ctx contractapi.TransactionContextInterface, blNumber string) error {
 
-	bl, err := s.QueryBl(ctx, blNumber)
+// 	bl, err := s.QueryBl(ctx, blNumber)
 
-	if err != nil {
-		return err
-	}
+// 	if err != nil {
+// 		return err
+// 	}
 
-	currentDate := time.Now()
-	formattedDate := currentDate.Format("02.01.2006 15:04:05") //formatted in "DD.MM.YYYY hh:mm:ss"
+// 	currentDate := time.Now()
+// 	formattedDate := currentDate.Format("02.01.2006 15:04:05") //formatted in "DD.MM.YYYY hh:mm:ss"
 
-	bl.CargoRecievedDate = formattedDate
+// 	bl.CargoReceivedDate = formattedDate
 
-	blAsBytes, _ := json.Marshal(bl)
+// 	blAsBytes, _ := json.Marshal(bl)
 
-	return ctx.GetStub().PutState(blNumber, blAsBytes)
+// 	return ctx.GetStub().PutState(blNumber, blAsBytes)
 
-}
+// }
 
-//LoadOnBoard kann in WebUi als bool bzw. Checkbox gebaut werden
+// LoadOnBoard kann in WebUi als bool bzw. Checkbox gebaut werden
 // LoadOnBoard sets the ShippedOnBoardDate
 func (s *SmartContract) LoadOnBoard(ctx contractapi.TransactionContextInterface, blNumber string) error {
 
@@ -413,6 +418,10 @@ func (s *SmartContract) LoadOnBoard(ctx contractapi.TransactionContextInterface,
 
 	if err != nil {
 		return err
+	}
+
+	if bl.ShippedOnBoardDate != "" {
+		return fmt.Errorf("Freight has already been shipped on Board, ShippedOnBoardDate is already set - ShippedOnBoardDate: ", bl.ShippedOnBoardDate)
 	}
 
 	currentDate := time.Now()
@@ -436,36 +445,75 @@ func (s *SmartContract) TransferBl(ctx contractapi.TransactionContextInterface, 
 	}
 
 	//check if orderAt party is authorized to issue endorsement
-	if bl.OrderTo == "" {
-		if OA != bl.CarrierName {
-			return fmt.Errorf("only the carrier can issue the first endorsement. Last argument must be equal to CarrierName")
-		}
-	} else {
-		if OA != bl.OrderTo {
-			return fmt.Errorf("The given OrderAt Party is not the current Owner and not authorised to issue an endorsement. -- current OrderAt: ", bl.OrderAt)
-		}
-	}
+	// if bl.OrderTo == "" {
+	// 	if OA != bl.CarrierName {
+	// 		return fmt.Errorf("only the carrier can issue the first endorsement. Last argument must be equal to CarrierName")
+	// 	}
+	// } else {
+	// 	if OA != bl.OrderTo {
+	// 		return fmt.Errorf("The given OrderAt Party is not the current Owner and not authorised to issue an endorsement. -- current OrderAt: ", bl.OrderAt)
+	// 	}
+	// }
 
-	if bl.BlTransferable == true && bl.OrderTo == bl.CarrierName {
-		bl.BlTransferable = false
-	}
-
-	if bl.BlTransferable == false {
+	if bl.BlTransferable == false && bl.OrderCheckbox == true {
 		return fmt.Errorf("The given B/L has already been returned to the carrier - a transfer is not possible -- Carrier:  ", bl.CarrierName)
 	}
 
-	if NPCN != "" || NPCA != "" || NPCLF != "" {
-		bl.NotifyPartyCompanyName = NPCN
-		bl.NotifyPartyCompanyAddress = NPCA
-		bl.NotifyPartyCompanyLegalForm = NPCLF
+	// OrderTo should not be set "" after first endorsement -> causes problem with following test for first endorsement
+	if OT == "" {
+		return fmt.Errorf("NewOrderTo darf nicht leer sein")
 	}
 
-	currentDate := time.Now()
-	formattedDate := currentDate.Format("02.01.2006 15:04:05") // formatted in "DD.MM.YYYY hh:mm:ss"
+	//check first endorsement with Ordercheckbox
+	if bl.OrderTo == "" {
 
-	bl.OrderDate = formattedDate
-	bl.OrderTo = OT // nächsterInhaber
-	bl.OrderAt = OA // ÜberschreibendePartei
+		if bl.OrderCheckbox == false {
+
+			return fmt.Errorf("The given B/L has no ordering option selected and is therefore not negotiable")
+		}
+		if bl.ConsigneeName != "" && OA != bl.ConsigneeName {
+			return fmt.Errorf("case or order - orderAt must be Consignee -- given OA: ", OA, " Consignee :", bl.ConsigneeName)
+		}
+		if bl.ConsigneeName == "" && OA != bl.ShipperName {
+			return fmt.Errorf("case to order - orderAt must be Shipper -- given OA ", OA, " Shipper: ", bl.ShipperName)
+		}
+	} else {
+		if OA != bl.OrderTo {
+			return fmt.Errorf("The given OrderAt party is not the current owner and not authorized to issue an endorsement -- current OrderAt: ", bl.OrderAt)
+		}
+	}
+
+	if bl.ShippedOnBoardDate == "" {
+		return fmt.Errorf("The freight has not been shipped on board, ShippedOnBoardDate not set")
+	}
+
+	if bl.ConsigneeName != "" && bl.OrderCheckbox == false {
+		bl.BlTransferable = false
+	}
+
+	if bl.BlTransferable != false {
+		if NPCN != "" || NPCA != "" || NPCLF != "" {
+			bl.NotifyPartyCompanyName = NPCN
+			bl.NotifyPartyCompanyAddress = NPCA
+			bl.NotifyPartyCompanyLegalForm = NPCLF
+		}
+
+		currentDate := time.Now()
+		formattedDate := currentDate.Format("02.01.2006 15:04:05") // formatted in "DD.MM.YYYY hh:mm:ss"
+
+		bl.OrderDate = formattedDate
+		bl.OrderTo = OT // nächsterInhaber
+		bl.OrderAt = OA // ÜberschreibendePartei
+	} else {
+		blAsBytes, _ := json.Marshal(bl)
+		ctx.GetStub().PutState(blNumber, blAsBytes)
+		return fmt.Errorf("given B/L is not negotiable")
+	}
+
+	//last endorsement -> orderto is carrier
+	if bl.BlTransferable == true && bl.OrderTo == bl.CarrierName && bl.OrderCheckbox == true {
+		bl.BlTransferable = false
+	}
 
 	blAsBytes, _ := json.Marshal(bl)
 
@@ -473,7 +521,7 @@ func (s *SmartContract) TransferBl(ctx contractapi.TransactionContextInterface, 
 }
 
 // DepreciationOfBl function for executing a depreciation --> manipulation of freight-fields in B/L
-func (s *SmartContract) DepreciationOfBl(ctx contractapi.TransactionContextInterface, blNumber string, newNrPKG int, newGrossWeight int, newGrossWeightUnit string, newDOG string, newDPP string, newMeasurement float64, newMeasurementUnit string, newDCVA int, newDCVC string, newAI string, newHM bool) error {
+func (s *SmartContract) DepreciationOfBl(ctx contractapi.TransactionContextInterface, blNumber string, newNrPKG string, newGrossWeight string, newGrossWeightUnit string, newDOG string, newDPP string, newMeasurement string, newMeasurementUnit string, newDCVA string, newDCVC string, newAI string, newHM string) error {
 
 	bl, err := s.QueryBl(ctx, blNumber)
 
@@ -481,17 +529,70 @@ func (s *SmartContract) DepreciationOfBl(ctx contractapi.TransactionContextInter
 		return err
 	}
 
-	bl.NumberOfPackages = newNrPKG
-	bl.GrossWeight = newGrossWeight
-	bl.GrossWeightUnit = newGrossWeightUnit
-	bl.DescriptionOfGoods = newDOG
-	bl.DescriptionPerPackage = newDPP
-	bl.Measurement = newMeasurement
-	bl.MeasurementUnit = newMeasurementUnit
-	bl.DeclaredCargoValueAmount = newDCVA
-	bl.DeclaredCargoValueCurrency = newDCVC
-	bl.AdditionalInformation = newAI
-	bl.HazardousMaterial = newHM
+	//Convert arguments to correct datatype
+	//manipulate bl freight data fields according to which fields are filled in in frontend
+	if newNrPKG != "" {
+		convNewNrPKG, converr := strconv.Atoi(newNrPKG)
+		if converr != nil {
+			return fmt.Errorf("Error while converting newNumberOfPackages to int in depreciation", converr.Error())
+		}
+		bl.NumberOfPackages = convNewNrPKG
+	}
+
+	if newGrossWeight != "" {
+		convNewGrossWeight, converr := strconv.Atoi(newGrossWeight)
+		if converr != nil {
+			return fmt.Errorf("Error while converting newGrossWeight to int in depreciation", converr.Error())
+		}
+		bl.GrossWeight = convNewGrossWeight
+	}
+
+	if newGrossWeightUnit != "" {
+		bl.GrossWeightUnit = newGrossWeightUnit
+	}
+
+	if newDOG != "" {
+		bl.DescriptionOfGoods = newDOG
+	}
+
+	if newDPP != "" {
+		bl.DescriptionPerPackage = newDPP
+	}
+
+	if newMeasurement != "" {
+		convNewMeasurement, converr := strconv.ParseFloat(newMeasurement, 64)
+		if converr != nil {
+			return fmt.Errorf("Error while converting newMeasurement to int in depreciation", converr.Error())
+		}
+		bl.Measurement = convNewMeasurement
+	}
+
+	if newMeasurementUnit != "" {
+		bl.MeasurementUnit = newMeasurementUnit
+	}
+
+	if newDCVA != "" {
+		convDCVA, converr := strconv.Atoi(newDCVA)
+		if converr != nil {
+			return fmt.Errorf("Error while converting newDeclaredCargoValueAmount (newDCVA) to int in depreciation", converr.Error())
+		}
+		bl.DeclaredCargoValueAmount = convDCVA
+	}
+
+	if newDCVC != "" {
+		bl.DeclaredCargoValueCurrency = newDCVC
+	}
+
+	if newAI != "" {
+		bl.AdditionalInformation = newAI
+	}
+	if newHM != "" {
+		convNewHM, converr := strconv.ParseBool(newHM)
+		if converr != nil {
+			return fmt.Errorf("Error while converting newHazardousMaterial (newHM) to int in depreciation", converr.Error())
+		}
+		bl.HazardousMaterial = convNewHM
+	}
 
 	blAsBytes, _ := json.Marshal(bl)
 

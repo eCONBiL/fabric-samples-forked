@@ -104,7 +104,7 @@ func main() {
 			fmt.Println(string(result))
 
 		} else if argument == "create" {
-			if len(os.Args) == 58 {
+			if len(os.Args) == 57 {
 
 				//Output loop for testing and monitoring purposes during development
 				for i := 0; i < len(os.Args); i++ {
@@ -134,8 +134,7 @@ func main() {
 				fmt.Println(string(result))
 				fmt.Println("B/L with key / BLNumber: ", os.Args[2], "successfully created.")
 			} else {
-				fmt.Println("57 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {NrOfBLIssued} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {DateOfRecieved} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods} {DescriptionPerPackage} {Measurement} {MeasurementUnit} {DeclaredCargoValueAmount} {DeclaredCargoValueCurrency} {AdditionalInformation} {HazardousMaterial} {CustomerOrderNumber} {TransportConditions} {ApplieableLaw} {PlaceOfJurisdiction} {CurrentOwner} {OrderBy} {OrderTo} {OrderAt}]")
-				fmt.Println("Values {CargoRecievedDate} and {ShippedOnBoardDate} are intepreted as empty strings")
+				fmt.Println("56 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods} {DescriptionPerPackage} {Measurement} {MeasurementUnit} {DeclaredCargoValueAmount} {DeclaredCargoValueCurrency} {AdditionalInformation} {HazardousMaterial} {CustomerOrderNumber} {TransportConditions} {ApplieableLaw} {PlaceOfJurisdiction} {CurrentOwner} {OrderBy} {OrderTo} {OrderAt}]")
 				fmt.Println("Your input: ", os.Args)
 				fmt.Println("Your input length: ", len(os.Args))
 			}
@@ -214,31 +213,31 @@ func main() {
 				fmt.Println("Wrong input for changeOceanVessel | should be: changeOceanVessel blNumber newOceanVesselName")
 			}
 
-		} else if argument == "redirectContainer" {
-			if len(os.Args) == 4 {
-				var blnr = os.Args[2]
-				var newDest = os.Args[3]
-				result, err = contract.SubmitTransaction("RedirectContainer", blnr, newDest)
-				if err != nil {
-					fmt.Printf("Failed to evaluate transaction during redirection of container: %s\n", err)
-					os.Exit(1)
-				}
-				fmt.Println("container redirection successfully executed  - issue 'go run fabcar.go query ", blnr, "' to see the result")
-			} else {
-				fmt.Println("Wrong input for redirectContainer | should be: redirectContainer blNumber newDestination")
-			}
+			// } else if argument == "redirectContainer" {
+			// 	if len(os.Args) == 4 {
+			// 		var blnr = os.Args[2]
+			// 		var newDest = os.Args[3]
+			// 		result, err = contract.SubmitTransaction("RedirectContainer", blnr, newDest)
+			// 		if err != nil {
+			// 			fmt.Printf("Failed to evaluate transaction during redirection of container: %s\n", err)
+			// 			os.Exit(1)
+			// 		}
+			// 		fmt.Println("container redirection successfully executed  - issue 'go run fabcar.go query ", blnr, "' to see the result")
+			// 	} else {
+			// 		fmt.Println("Wrong input for redirectContainer | should be: redirectContainer blNumber newDestination")
+			// 	}
 
-		} else if argument == "returnWithoutLoading" {
-			if len(os.Args) == 3 {
-				result, err = contract.SubmitTransaction("ReturnBlWithoutLoading", os.Args[2])
-				if err != nil {
-					fmt.Printf("Failed to evaluate transaction during return of B/L without loading: %s\n", err)
-					os.Exit(1)
-				}
-				fmt.Println("return without loading successfully executed  - issue 'go run fabcar.go query ", os.Args[2], "' to see the result")
-			} else {
-				fmt.Println("Wrong input for returnWithoutLoading | should be: returnWithoutLoading blNumber")
-			}
+			// } else if argument == "returnWithoutLoading" {
+			// 	if len(os.Args) == 3 {
+			// 		result, err = contract.SubmitTransaction("ReturnBlWithoutLoading", os.Args[2])
+			// 		if err != nil {
+			// 			fmt.Printf("Failed to evaluate transaction during return of B/L without loading: %s\n", err)
+			// 			os.Exit(1)
+			// 		}
+			// 		fmt.Println("return without loading successfully executed  - issue 'go run fabcar.go query ", os.Args[2], "' to see the result")
+			// 	} else {
+			// 		fmt.Println("Wrong input for returnWithoutLoading | should be: returnWithoutLoading blNumber")
+			// 	}
 
 		} else if argument == "load" {
 			if len(os.Args) == 3 {

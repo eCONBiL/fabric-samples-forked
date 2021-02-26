@@ -29,6 +29,7 @@ import (
 func main() {
 	os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
 	wallet, err := gateway.NewFileSystemWallet("wallet")
+	fmt.Printf("Hallo")
 	if err != nil {
 		fmt.Printf("Failed to create wallet: %s\n", err)
 		os.Exit(1)
@@ -251,10 +252,10 @@ func main() {
 				fmt.Println("Wrong input for load | should be: load blNumber")
 			}
 		} else {
-			fmt.Println("No valid argument | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, redirectContainer, load, returnWithoutLoading")
+			fmt.Println("No valid argument | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, load")
 		}
 	} else {
-		fmt.Println("Missing argument(s) | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, redirectContainer, load, returnWithoutLoading")
+		fmt.Println("Missing argument(s) | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, load")
 	}
 }
 
@@ -269,7 +270,7 @@ func populateWallet(wallet *gateway.Wallet) error {
 		"users",
 		"User1@org1.example.com",
 		"msp",
-	)
+	) //test-network/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore
 
 	certPath := filepath.Join(credPath, "signcerts", "cert.pem")
 	// read the certificate pem

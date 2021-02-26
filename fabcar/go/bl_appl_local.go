@@ -1,7 +1,7 @@
 /*
 Copyright 2020 IBM All Rights Reserved.
 
-fabcar.go main program containing some chaincode interaction commands for testing written BL chaincode locally
+bl_appl_local.go main program containing some chaincode interaction commands for testing written BL chaincode locally
 
 edited for using command line arguments for chaincode interaction
 
@@ -29,6 +29,7 @@ import (
 func main() {
 	os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
 	wallet, err := gateway.NewFileSystemWallet("wallet")
+	fmt.Printf("Hallo")
 	if err != nil {
 		fmt.Printf("Failed to create wallet: %s\n", err)
 		os.Exit(1)
@@ -134,7 +135,7 @@ func main() {
 				fmt.Println(string(result))
 				fmt.Println("B/L with key / BLNumber: ", os.Args[2], "successfully created.")
 			} else {
-				fmt.Println("56 Arguments expected  |  go run fabcar.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods} {DescriptionPerPackage} {Measurement} {MeasurementUnit} {DeclaredCargoValueAmount} {DeclaredCargoValueCurrency} {AdditionalInformation} {HazardousMaterial} {CustomerOrderNumber} {TransportConditions} {ApplieableLaw} {PlaceOfJurisdiction} {CurrentOwner} {OrderBy} {OrderTo} {OrderAt}]")
+				fmt.Println("56 Arguments expected  |  go run bl_appl_local.go [create {BLNumber} {DateOfIssue} {PlaceOfIssue} {ShipperName} {ShipperAddress} {ShipperContact} {ShipperLegalForm} {ConsigneeName} {ConsigneeAddress} {ConsigneeContact} {ConsigneeLegalForm} {CarrierName} {CarrierAddress} {CarrierContact} {CarrierLegalForm} {CarrierTrailerNr} {AgentCompanyName} {AgentCompanyLegalForm} {AgentCompanyAddress} {NotifyPartyCompanyName} {NotifyPartyCompanyAddress} {NotifyPartyCompanyLegalForm} {NotifyPartySameAs} {Incoterms} {FreightChargesCurrency} {Prepaid} {Collect} {PortOfLoading} {PortOfDischarge} {PlaceOfReceipt} {PlaceOfDelivery} {OceanVesselName} {Containernumber} {FullContainerLoad} {LessThenContainerLoad} {ShippedOnBoardDate} {MarksAndNumbers} {NumberOfPackages} {GrossWeight} {GrossWeightUnit} {DescriptionOfGoods} {DescriptionPerPackage} {Measurement} {MeasurementUnit} {DeclaredCargoValueAmount} {DeclaredCargoValueCurrency} {AdditionalInformation} {HazardousMaterial} {CustomerOrderNumber} {TransportConditions} {ApplieableLaw} {PlaceOfJurisdiction} {CurrentOwner} {OrderBy} {OrderTo} {OrderAt}]")
 				fmt.Println("Your input: ", os.Args)
 				fmt.Println("Your input length: ", len(os.Args))
 			}
@@ -193,7 +194,7 @@ func main() {
 					fmt.Printf("Failed to evaluate transaction during depreciation: %s\n", err)
 					os.Exit(1)
 				}
-				fmt.Println("Depreciation successfully executed - issue 'go run fabcar.go query ", bln, "' to see the result")
+				fmt.Println("Depreciation successfully executed - issue 'go run bl_appl_local.go query ", bln, "' to see the result")
 
 			} else {
 				fmt.Println("Wrong input for depreciation |  should be: depreciation blNumber newNrPKG newGrossWeight newGrossWeightUnit newDOG newDPP newMeasurement newMeasurementUnit newDCVA newDCVC newAI newHM")
@@ -207,7 +208,7 @@ func main() {
 					fmt.Printf("Failed to evaluate transaction during change of ocean vessel name: %s\n", err)
 					os.Exit(1)
 				}
-				fmt.Println("change of ocean vessel name successfully executed  - issue 'go run fabcar.go query ", blnr, "' to see the result")
+				fmt.Println("change of ocean vessel name successfully executed  - issue 'go run bl_appl_local.go query ", blnr, "' to see the result")
 				fmt.Println(blnr)
 			} else {
 				fmt.Println("Wrong input for changeOceanVessel | should be: changeOceanVessel blNumber newOceanVesselName")
@@ -222,7 +223,7 @@ func main() {
 			// 			fmt.Printf("Failed to evaluate transaction during redirection of container: %s\n", err)
 			// 			os.Exit(1)
 			// 		}
-			// 		fmt.Println("container redirection successfully executed  - issue 'go run fabcar.go query ", blnr, "' to see the result")
+			// 		fmt.Println("container redirection successfully executed  - issue 'go run bl_appl_local.go query ", blnr, "' to see the result")
 			// 	} else {
 			// 		fmt.Println("Wrong input for redirectContainer | should be: redirectContainer blNumber newDestination")
 			// 	}
@@ -234,7 +235,7 @@ func main() {
 			// 			fmt.Printf("Failed to evaluate transaction during return of B/L without loading: %s\n", err)
 			// 			os.Exit(1)
 			// 		}
-			// 		fmt.Println("return without loading successfully executed  - issue 'go run fabcar.go query ", os.Args[2], "' to see the result")
+			// 		fmt.Println("return without loading successfully executed  - issue 'go run bl_appl_local.go query ", os.Args[2], "' to see the result")
 			// 	} else {
 			// 		fmt.Println("Wrong input for returnWithoutLoading | should be: returnWithoutLoading blNumber")
 			// 	}
@@ -246,15 +247,15 @@ func main() {
 					fmt.Printf("Failed to evaluate transaction during loading on board: %s\n", err)
 					os.Exit(1)
 				}
-				fmt.Println("loading on board successfully executed  - issue 'go run fabcar.go query ", os.Args[2], "' to see the result")
+				fmt.Println("loading on board successfully executed  - issue 'go run bl_appl_local.go query ", os.Args[2], "' to see the result")
 			} else {
 				fmt.Println("Wrong input for load | should be: load blNumber")
 			}
 		} else {
-			fmt.Println("No valid argument | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, redirectContainer, load, returnWithoutLoading")
+			fmt.Println("No valid argument | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, load")
 		}
 	} else {
-		fmt.Println("Missing argument(s) | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, redirectContainer, load, returnWithoutLoading")
+		fmt.Println("Missing argument(s) | try: queryAll , create , query, help, endorsement, depreciation, changeOceanVessel, load")
 	}
 }
 
@@ -269,7 +270,7 @@ func populateWallet(wallet *gateway.Wallet) error {
 		"users",
 		"User1@org1.example.com",
 		"msp",
-	)
+	) //test-network/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore
 
 	certPath := filepath.Join(credPath, "signcerts", "cert.pem")
 	// read the certificate pem

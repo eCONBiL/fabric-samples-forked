@@ -366,6 +366,10 @@ func (s *SmartContract) ChangeOceanVessel(ctx contractapi.TransactionContextInte
 		return err
 	}
 
+	if newOceanVesselName == "" {
+		return fmt.Errorf("The new OceanVesselName must not be empty")
+	}
+
 	bl.OceanVesselName = newOceanVesselName
 
 	blAsBytes, _ := json.Marshal(bl)
